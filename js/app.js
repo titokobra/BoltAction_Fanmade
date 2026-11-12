@@ -23,7 +23,7 @@ if (state.countLimitNotice === undefined) state.countLimitNotice = '';
 function save(){try{localStorage.setItem('ba_state',JSON.stringify(state))}catch(e){console.warn('No se pudo guardar el estado de la partida',e)}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function btn(label,fn,cls=''){return `<button class="${cls}" data-action="${fn}">${label}</button>`}
-function backButton(){return `<nav class="nav-stack" aria-label="Navegación"><button class="nav-button" data-action="back" aria-label="Volver"><span class="nav-icon">←</span><span>VOLVER</span></button><button class="nav-button" data-action="go-home" aria-label="Inicio"><span class="nav-icon">⌂</span><span>INICIO</span></button></nav>`}
+function backButton(){return `<nav class="nav-stack" aria-label="Navegación"><button class="nav-button nav-back" data-action="back" aria-label="Volver" title="Volver"><svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="nav-button nav-home" data-action="go-home" aria-label="Inicio" title="Inicio"><svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2L12 4l8 7.2M6.5 9.8V20h4v-5.5h3V20h4V9.8"/></svg></button></nav>`}
 function formatClock(ms){
  const total=Math.max(0,Math.floor(ms/1000));
  const h=Math.floor(total/3600),m=Math.floor((total%3600)/60),sec=total%60;
