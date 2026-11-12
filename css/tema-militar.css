@@ -1,0 +1,447 @@
+/* ==========================================================================
+   BOLT ACTION FANMADE · tema "panel militar"
+   Se carga DESPUÉS de estilos.css y lo sobrescribe. No toca la lógica.
+   Para volver al diseño anterior: quita el <link> a este archivo en index.html.
+   ========================================================================== */
+
+:root{
+  --o-950:#14180f;
+  --o-900:#1c2214;
+  --o-800:#272f1c;
+  --o-700:#364127;
+  --o-600:#4a5832;
+  --parch-100:#eadfc0;
+  --parch-200:#d8c79c;
+  --parch-300:#c4af7e;
+  --sand-top:#dcc99b;
+  --sand-bot:#b89d68;
+  --edge:#8d7d55;
+  --edge-dark:#5d5238;
+  --ink:#1d1a11;
+  --cream:#f1e9d2;
+  --red-army:#7a2f33;
+  --green-army:#2f5a35;
+  --font-title:'Oswald','Bebas Neue','Arial Narrow',Impact,sans-serif;
+  --font-body:'Barlow','Segoe UI',Arial,sans-serif;
+  --grain:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),
+          repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 1px,transparent 1px 4px);
+}
+
+/* ---------- Base ---------- */
+body{font-family:var(--font-body);color:var(--cream)}
+body:before{
+  background:
+    radial-gradient(ellipse at 50% 30%,rgba(20,24,15,.30),rgba(10,12,8,.82) 78%),
+    linear-gradient(180deg,rgba(28,34,20,.78),rgba(14,17,10,.88));
+}
+#app{max-width:1000px}
+
+/* ---------- Cabecera / título ---------- */
+header h1{
+  font-family:var(--font-title);
+  font-weight:700;
+  font-stretch:normal;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  line-height:.95;
+  color:#ece5cf;
+  text-shadow:0 2px 0 #0b0d08,3px 5px 0 rgba(0,0,0,.55),0 0 28px rgba(0,0,0,.7);
+}
+header h1::first-line{color:#ece5cf}
+header p{
+  font-family:var(--font-title);
+  font-weight:500;
+  color:var(--sand-top);
+  letter-spacing:.22em;
+  text-shadow:1px 2px 3px #000;
+}
+
+/* ---------- Paneles ---------- */
+.panel{
+  position:relative;
+  background:var(--grain),linear-gradient(160deg,var(--parch-100),var(--parch-200));
+  color:var(--ink);
+  border:2px solid var(--edge);
+  border-radius:8px;
+  box-shadow:0 14px 34px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.25),inset 0 0 40px rgba(90,70,30,.28);
+  padding:0 20px 22px;
+  overflow:hidden;
+}
+/* Barra de título tipo cabecera de la maqueta */
+.panel h2{
+  font-family:var(--font-title);
+  font-weight:600;
+  font-size:1.3rem;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  text-align:center;
+  color:var(--cream);
+  background:var(--grain),linear-gradient(180deg,var(--o-800),var(--o-950));
+  border:0;
+  border-bottom:2px solid var(--edge);
+  border-radius:0;
+  margin:0 -20px 20px;
+  padding:14px 16px;
+  text-shadow:0 2px 3px #000;
+  box-shadow:none;
+}
+.panel h3{font-family:var(--font-title);font-weight:600;letter-spacing:.05em;color:#3e341f}
+.panel p{line-height:1.5}
+
+/* ---------- Pantallas oscuras (olivas) ---------- */
+body[data-screen="home"] .panel,
+body[data-screen="factions"] .panel,
+body[data-screen="faction-detail"] .panel,
+body[data-screen="round-title"] .panel,
+body[data-screen="draw"] .panel,
+body[data-screen="round-finished"] .panel,
+body[data-screen="count"] .panel,
+body[data-screen="finish-choice"] .panel,
+body[data-screen="generating"] .panel,
+body[data-screen="winner"] .panel{
+  background:var(--grain),linear-gradient(160deg,var(--o-700),var(--o-900));
+  color:var(--cream);
+  border-color:var(--edge);
+  box-shadow:0 14px 34px rgba(0,0,0,.65),inset 0 0 50px rgba(0,0,0,.35);
+}
+body[data-screen="count"] .count-instruction,
+body[data-screen="finish-choice"] .panel p{color:var(--cream)}
+
+/* ---------- Botones: arena con texto oscuro (como en la maqueta) ---------- */
+button,.menu-button{
+  font-family:var(--font-title);
+  font-weight:600;
+  font-size:1.02rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink);
+  background:linear-gradient(180deg,var(--sand-top),var(--sand-bot));
+  border:1px solid var(--edge-dark);
+  border-radius:6px;
+  box-shadow:0 3px 0 var(--edge-dark),0 6px 10px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.45);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+  transition:transform .1s,filter .1s,box-shadow .1s;
+}
+button:hover{
+  background:linear-gradient(180deg,#e6d4a6,#c4a972);
+  filter:none;
+  transform:translateY(-1px);
+}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge-dark),0 2px 4px rgba(0,0,0,.4)}
+button:focus-visible,input:focus-visible{outline:3px solid #f2d27a;outline-offset:2px}
+
+/* Botones de menú secundarios: oliva oscuro con texto arena */
+.menu-button{
+  min-height:58px;
+  color:var(--sand-top);
+  background:linear-gradient(180deg,rgba(54,65,39,.95),rgba(30,37,22,.95));
+  border:1px solid var(--edge-dark);
+  box-shadow:0 3px 0 #0d1008,0 6px 10px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+  text-shadow:0 2px 2px #000;
+  text-align:left;
+  padding:14px 18px;
+}
+.menu-button:hover{background:linear-gradient(180deg,rgba(70,84,50,.98),rgba(40,49,29,.98));color:#f0e0b4}
+
+/* Pantalla de inicio: lista vertical, primer botón destacado */
+.home-panel{
+  max-width:520px;
+  margin:0 auto;
+  padding:18px;
+  backdrop-filter:none;
+}
+.home-panel .menu-grid{grid-template-columns:1fr;gap:10px}
+.home-panel .menu-button{min-height:54px;font-size:1.05rem}
+.home-panel .menu-button:first-child{
+  min-height:68px;
+  font-size:1.3rem;
+  color:var(--ink);
+  background:linear-gradient(180deg,var(--sand-top),var(--sand-bot));
+  box-shadow:0 4px 0 var(--edge-dark),0 8px 14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.5);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+.home-panel .menu-button:first-child:hover{background:linear-gradient(180deg,#e8d6a8,#c6ab74)}
+.home-actions button{min-width:0;width:100%;margin-top:4px}
+
+/* Menús sobre pergamino (reglas, escenarios, despliegue) */
+.panel .menu-grid{gap:11px}
+.rule-menu-button,.deployment-options .menu-button{justify-content:flex-start;text-align:left}
+
+/* Listas de escenarios/reglas sobre pergamino */
+.scenario-list button{
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:1rem;
+  letter-spacing:.01em;
+  text-transform:none;
+  text-align:left;
+  color:var(--ink);
+  background:linear-gradient(180deg,#f3e9cd,#dccaa0);
+  border:1px solid var(--edge);
+  border-radius:5px;
+  box-shadow:0 2px 0 var(--edge-dark),0 4px 6px rgba(0,0,0,.18);
+  text-shadow:none;
+}
+.scenario-list button:hover{background:linear-gradient(180deg,#faf1d7,#e6d4a9)}
+.faction-index .scenario-list button{
+  color:var(--sand-top);
+  background:linear-gradient(180deg,rgba(54,65,39,.95),rgba(30,37,22,.95));
+  border-color:var(--edge-dark);
+  font-family:var(--font-title);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  text-shadow:0 2px 2px #000;
+  box-shadow:0 3px 0 #0d1008,0 6px 10px rgba(0,0,0,.4);
+}
+
+/* Texto largo */
+.scenario-content{font-family:var(--font-body);font-size:1.02rem;line-height:1.6;color:var(--ink)}
+.scenario-content strong{color:#4a3512}
+.deployment-roll-prompt{
+  font-family:var(--font-title);
+  color:var(--ink);
+  background:rgba(255,255,255,.28);
+  border:1px solid var(--edge);
+  border-radius:5px;
+  letter-spacing:.1em;
+}
+.deployment-rule-card{background:transparent;border:0;box-shadow:none;padding:0}
+.deployment-rule-card h2{margin:0 0 16px}
+.rule-table th{background:var(--o-800);color:var(--sand-top);font-family:var(--font-title);letter-spacing:.05em;border-color:var(--edge-dark)}
+.rule-table td{background:rgba(255,255,255,.35);color:var(--ink);border-color:var(--edge)}
+
+/* ---------- Facciones ---------- */
+.faction-page-heading{
+  background:var(--grain),linear-gradient(180deg,var(--o-600),var(--o-800));
+  border:1px solid var(--edge);
+  border-radius:6px;
+  box-shadow:inset 0 0 22px rgba(0,0,0,.35);
+  margin-top:18px;
+}
+.faction-page-heading span,.faction-page-heading small{font-family:var(--font-title);color:var(--sand-top);letter-spacing:.14em}
+.faction-page-heading h2{font-family:var(--font-title)!important;color:var(--cream)!important;text-transform:uppercase;text-shadow:0 2px 3px #000!important}
+.faction-card{
+  background:rgba(14,17,10,.55);
+  border:1px solid var(--edge-dark);
+  border-radius:6px;
+  color:var(--cream);
+  box-shadow:inset 0 0 14px rgba(0,0,0,.35);
+}
+.faction-card-title{background:linear-gradient(180deg,var(--o-600),var(--o-800));border:1px solid var(--edge-dark);border-radius:4px}
+.faction-card-title strong{font-family:var(--font-title);font-weight:600;letter-spacing:.05em;color:var(--sand-top)}
+.faction-card-title em{color:#d9cfb2}
+.faction-card-text{color:var(--cream)}
+.faction-national{background:linear-gradient(180deg,var(--o-600),var(--o-800));border:1px solid var(--edge);border-radius:6px}
+.faction-national h3{font-family:var(--font-title);color:var(--sand-top)}
+
+/* ---------- Formularios (configurar partida) ---------- */
+.field label{font-family:var(--font-title);font-weight:500;font-size:1.1rem;letter-spacing:.04em;color:var(--ink)}
+input,.setup-name-input{
+  font-family:var(--font-body);
+  background:linear-gradient(180deg,#f6eed6,#e9dcb8);
+  color:var(--ink);
+  border:1px solid var(--edge);
+  border-radius:5px;
+  box-shadow:inset 0 2px 4px rgba(70,50,15,.25);
+  max-width:none;
+}
+.setup-name-input::placeholder{color:#8a7d5e;opacity:1}
+
+.dice-setup-field{align-items:stretch}
+.initial-dice-control{
+  max-width:240px;
+  margin:6px 0;
+  justify-content:flex-start;
+  gap:0;
+  border:1px solid var(--edge-dark);
+  border-radius:7px;
+  overflow:hidden;
+  box-shadow:0 3px 0 var(--edge-dark),0 5px 8px rgba(0,0,0,.25);
+}
+.initial-dice-control strong{
+  flex:1;
+  min-width:0;
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-title);
+  font-size:1.9rem;
+  font-weight:600;
+  color:var(--ink);
+  background:linear-gradient(180deg,#f6eed6,#e9dcb8);
+}
+.initial-dice-control button{
+  width:52px;
+  height:48px;
+  border:0;
+  border-radius:0;
+  font-family:var(--font-title);
+  font-size:1.8rem;
+  font-weight:600;
+  color:var(--ink);
+  background:linear-gradient(180deg,var(--sand-top),var(--sand-bot));
+  box-shadow:none;
+}
+.initial-dice-control button:active{background:#a98e5a;transform:none}
+
+.choice-row{margin-top:22px}
+.choice-row button{min-height:54px;font-size:1.1rem;padding:12px 22px}
+.setup-panel .choice-row button{width:100%}
+
+/* ---------- Ronda / bolsa de dados ---------- */
+.turn-title{
+  font-family:var(--font-title);
+  font-weight:700;
+  color:var(--cream);
+  letter-spacing:.1em;
+  text-shadow:0 3px 0 #0b0d08,0 0 24px rgba(0,0,0,.8);
+}
+.counter{
+  font-family:var(--font-title);
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  background:linear-gradient(180deg,var(--green-army),#1f3d24);
+  border:1px solid var(--edge);
+  border-radius:6px;
+  color:var(--cream);
+  box-shadow:inset 0 0 18px rgba(0,0,0,.35),0 4px 10px rgba(0,0,0,.4);
+}
+.counter strong{font-weight:600}
+.counter small{font-family:var(--font-body);text-transform:none;letter-spacing:0;color:#dcd2b6}
+.player-2-counter{background:linear-gradient(180deg,var(--red-army),#4d1c20);border:1px solid var(--edge);color:var(--cream)}
+
+.draw-area,.round-finish-area{
+  border:2px solid var(--edge);
+  border-radius:8px;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(214,190,130,.20),transparent 62%),
+    var(--grain),
+    linear-gradient(180deg,#2b3120,#171b11);
+  box-shadow:inset 0 0 44px rgba(0,0,0,.7),0 6px 16px rgba(0,0,0,.5);
+}
+.draw-area .player-name,.round-finish-title{
+  font-family:var(--font-title);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:#fff;
+}
+.curtain{background:#0c0e09}
+.extracted-summary{
+  font-family:var(--font-body);
+  background:rgba(0,0,0,.35);
+  color:var(--cream);
+  border:1px solid var(--edge-dark);
+  border-radius:6px;
+}
+.extracted-summary strong{color:#fff}
+.draw-actions button{min-height:60px;font-size:1.15rem}
+.draw-actions button[data-action="end-round"]{
+  color:var(--cream);
+  background:linear-gradient(180deg,#9a3f3a,#5e211f);
+  border-color:#3a1210;
+  box-shadow:0 3px 0 #2a0c0b,0 6px 10px rgba(0,0,0,.4);
+  text-shadow:0 2px 2px #000;
+}
+.dice-remove-action button{
+  font-size:.82rem;
+  color:var(--sand-top);
+  background:rgba(0,0,0,.35);
+  border:1px solid var(--edge-dark);
+  box-shadow:none;
+  text-shadow:none;
+}
+.bottom-note{color:#cfc5aa}
+
+/* ---------- Ajuste de dados para la siguiente ronda ---------- */
+.player-adjust{
+  background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.42));
+  border:1px solid var(--edge-dark);
+  border-radius:8px;
+  color:var(--cream);
+}
+.player-adjust .pname{font-family:var(--font-title);font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--sand-top)}
+.player-adjust .count{font-family:var(--font-title);font-size:1.9rem;font-weight:600;color:#fff}
+.player-adjust button{font-size:1.5rem;padding:6px;min-height:46px}
+.count-instruction{font-family:var(--font-body);color:var(--cream);font-weight:600}
+.notice{background:rgba(0,0,0,.28);color:var(--cream);border-left:3px solid var(--sand-top);border-radius:0 5px 5px 0}
+.panel .muted,small.muted{color:#cfc5aa}
+
+/* ---------- Final de partida y reloj ---------- */
+#globalClock{
+  background:linear-gradient(180deg,rgba(28,34,20,.96),rgba(14,17,10,.96));
+  border:1px solid var(--edge);
+  border-radius:6px;
+  box-shadow:0 4px 14px rgba(0,0,0,.6),inset 0 0 12px rgba(0,0,0,.4);
+}
+#globalClock .clock-label{font-family:var(--font-title);color:var(--sand-top);letter-spacing:.14em}
+#globalClock .clock-value{font-family:var(--font-title);font-weight:600;color:var(--cream)}
+body[data-screen="winner"] #globalClock{padding:14px 26px}
+body[data-screen="winner"] #globalClock .clock-value{font-size:2.6rem}
+body[data-screen="winner"] .panel h3{color:var(--sand-top);font-size:1.5rem;text-transform:uppercase}
+
+/* ---------- Navegación (Volver / Inicio) ---------- */
+.nav-button{
+  font-family:var(--font-title);
+  font-weight:500;
+  color:var(--sand-top);
+  background:linear-gradient(180deg,rgba(54,65,39,.97),rgba(24,30,17,.97));
+  border:1px solid var(--edge);
+  border-radius:6px;
+  box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
+  text-shadow:0 1px 2px #000;
+}
+.nav-button:hover{background:linear-gradient(180deg,rgba(74,88,50,.98),rgba(34,42,24,.98))}
+
+/* ---------- Ventanas modales ---------- */
+.reset-confirm-card,.remove-modal-card{
+  background:var(--grain),linear-gradient(160deg,var(--o-700),var(--o-950));
+  border:2px solid var(--edge);
+  border-radius:8px;
+  color:var(--cream);
+}
+.reset-confirm-card h2,.remove-modal-card h2{
+  font-family:var(--font-title);
+  color:var(--sand-top);
+  background:none;
+  border:0;
+  margin:0 0 12px;
+  padding:0;
+  letter-spacing:.07em;
+  text-shadow:0 2px 3px #000;
+}
+.reset-confirm-card p,.remove-help{color:var(--cream)}
+.reset-confirm-actions .cancel-reset,.remove-modal-choices .cancel-remove{
+  color:var(--cream);
+  background:linear-gradient(180deg,#5a5b4f,#363730);
+  border-color:#1c1d18;
+  box-shadow:0 3px 0 #131410;
+  text-shadow:0 1px 2px #000;
+}
+
+/* ---------- Aviso al reanudar y flanqueo ---------- */
+.resume-notice{background:rgba(0,0,0,.4);border:1px solid var(--edge);border-radius:6px;color:var(--cream)}
+.flank-choice{font-family:var(--font-title)}
+.flank-game-tools{background:rgba(0,0,0,.3);border:1px solid var(--edge-dark);border-radius:6px}
+.flank-button{width:100%}
+
+/* ---------- Pie ---------- */
+footer{font-family:var(--font-body);color:#d9cfb4;text-shadow:1px 2px 4px #000}
+
+/* ---------- Móvil ---------- */
+@media(max-width:560px){
+  .panel{padding:0 13px 16px}
+  .panel h2{margin:0 -13px 14px;padding:12px 10px;font-size:1.12rem}
+  .home-panel{padding:13px}
+  .home-panel .menu-button:first-child{min-height:60px;font-size:1.2rem}
+  header h1{font-size:2.5rem}
+  body[data-screen="draw"] .panel{padding:10px}
+  .initial-dice-control{max-width:100%}
+}
+
+/* ---------- Accesibilidad: sin animaciones si el usuario lo pide ---------- */
+@media (prefers-reduced-motion:reduce){
+  button,.menu-button{transition:none}
+  .curtain.lift{animation-duration:.01s}
+}
