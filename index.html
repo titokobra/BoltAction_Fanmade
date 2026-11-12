@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c2214">
+<title>BOLT ACTION FANMADE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/tema-militar.css">
+
+</head>
+<body>
+<div class="reset-confirm-modal" id="resetConfirmModal" role="dialog" aria-modal="true" aria-labelledby="resetConfirmTitle">
+ <div class="reset-confirm-card">
+  <h2 id="resetConfirmTitle">¿REINICIAR PARTIDA?</h2>
+  <p>Si confirmas, se borrará la partida guardada y el reloj volverá a cero. Si cancelas, todo seguirá igual.</p>
+  <div class="reset-confirm-actions"><button type="button" data-reset-choice="yes">SÍ, REINICIAR</button><button type="button" class="cancel-reset" data-reset-choice="no">NO, CONTINUAR</button></div>
+ </div>
+</div>
+<div id="app">
+<header><h1>BOLT ACTION FANMADE</h1><p>ORDEN · ESTRATEGIA · VICTORIA</p></header>
+<main id="view"></main>
+<footer>Herramienta de apoyo para partidas de Bolt Action<br>Versión v 0.21 · Noviembre 2026<br><strong style="color:#f2c94c;font-weight:800;">Creado por TitoKobra</strong></footer>
+</div>
+<script src="js/datos.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
