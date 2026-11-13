@@ -1,3 +1,24 @@
+/* =============================================================================
+   DATOS.JS · TODOS LOS TEXTOS DEL JUEGO (sin lógica)
+   =============================================================================
+   Aquí está el contenido que se muestra en las pantallas. Puedes editarlo sin
+   tocar app.js. Reglas importantes al editar:
+     • Respeta las comillas, comas y llaves. Un fallo aquí deja la web en blanco.
+     • Los textos entre `comillas invertidas` pueden ocupar varias líneas.
+     • Dentro de comillas normales "..." usa \n para un salto de línea.
+     • Si el texto lleva comillas del mismo tipo, escápalas con \ (ej. \").
+   SECCIONES (busca con Ctrl+F):
+     scenarioGroups     → escenarios
+     specialRules       → reglas de armas, unidades y vehículos
+     factionRules       → reglas especiales de cada ejército
+     deploymentRules    → tipos de despliegue (1-3, 4-5, 6)
+     baseScenarioNames / baseScenarioTexts → escenarios del juego base (D6)
+   ============================================================================= */
+
+// ESCENARIOS · Cada grupo (p. ej. "ESCENARIOS JUEGO BASE") contiene una lista de
+// escenarios con este formato:   ["número", "TÍTULO", `texto completo`],
+// Para añadir uno: copia un bloque [ ... ], cambia número, título y texto, y
+// recuerda la coma al final. Para un grupo nuevo: "NOMBRE DEL GRUPO": [ ... ],
 const scenarioGroups = {
 "ESCENARIOS JUEGO BASE": [
  ["1","BUSCAR Y DESTRUIR / SEEK AND DESTROY",
@@ -800,6 +821,10 @@ Despliegue oculto: No
 Bombardeo preliminar: No`],
 ]
 };
+// REGLAS ESPECIALES · Tres categorías (ARMAS, UNIDADES, VEHÍCULOS).
+// Formato de cada regla:   "NOMBRE DE LA REGLA": "texto",
+// Se muestran ordenadas alfabéticamente. El nombre de la categoría debe coincidir
+// con el de los botones de rulesMenu() en app.js.
 const specialRules = {
   "REGLAS DE ARMAS": {
     "ALTO EXPLOSIVO (HE)": "Las armas con atributos de penetración y HE deben decidir antes de disparar a los vehículos qué tipo de disparo se va a realizar. Al disparar HE, elige una unidad objetivo y tira para impactar normalmente (usando fuego directo o indirecto según corresponda). Si la unidad es impactada, usa el tamaño de plantilla especificado para determinar cuántos modelos son impactados en la unidad objetivo. La plantilla se puede colocar en cualquier lugar sobre o entre los modelos de la unidad objetivo. La plantilla no puede tocar ningún modelo amigo. Cuenta los modelos totalmente cubiertos y parcialmente cubiertos como impactos. Si los modelos de otras unidades enemigas son cubiertos, también son impactados, siempre que primero intentes impactar a tantos modelos como puedas en la unidad objetivo y no toques a ningún modelo amigo en el proceso.\n\nLa unidad objetivo puede elegir hacer Down en respuesta a los disparos, en cuyo caso tira para impactar y determina el número de impactos normalmente, pero luego divide a la mitad el número de impactos (redondeando hacia arriba). Los impactos HE pueden causar múltiples Pines en el objetivo según lo especificado por la tabla de disparos HE. El objetivo luego tira salvaciones de cobertura. Aplica los valores de Pen a las tiradas de daño según lo determinado por la tabla de disparos HE. Los modelos eliminados como bajas pueden provenir de cualquier parte de la unidad, no solo de aquellos cubiertos por la plantilla.\n\nCuando una unidad capaz de disparar proyectiles AT y HE es colocada en Ambush, se marca el tipo de proyectil cargado en la unidad. Si no se hace esto, el tipo de proyectil cargado se considera automáticamente AT.\n\nImpactos múltiples de HE: si una unidad dispara varios tiros de HE simultáneamente, tira para impactar con todos los disparos normalmente y luego, por cada impacto, coloca una plantilla. Las plantillas no necesitan estar en contacto entre sí. Los modelos cubiertos por varias plantillas siguen generando un solo impacto. La unidad objetivo sufre solo un único efecto de los marcadores de supresión (cuenta como un solo disparo combinado).",
@@ -849,6 +874,10 @@ const specialRules = {
 };
 
 
+// REGLAS DE FACCIÓN · Un bloque por ejército. Cada regla:
+//   {title:"NOMBRE", text:`descripción`},
+// Para añadir un ejército: copia un bloque completo  "EJÉRCITO X": [ ... ],
+// Hay también reglas 'nacionales' con opciones (national:true, options:[...]).
 const factionRules = {
   "EJÉRCITO ALEMÁN": [
     {title:"BLITZKRIEG", text:`Los oficiales alemanes que usen la habilidad "¡Soldados !; A la acción!" pueden coger un dado de orden adicional de la bolsa y asignarlo de la forma habitual. En otras palabras, un jefe de pelotón alemán (Leutnant u Oberleutnant) coge tres dados, ¡un jefe de compañía (Hauptmann o Major) coge cinco!`},
@@ -886,6 +915,8 @@ const factionRules = {
   ]
 };
 
+// TIPOS DE DESPLIEGUE · Claves '1-3', '4-5' y '6' (resultado del dado D6).
+// Cada clave tiene el texto que se muestra en esa pantalla.
 const deploymentRules = { '1-3': `Ambos jugadores tiran un dado. El jugador con mayor puntuación declara cuáles de sus unidades (si las hay) se dejan en reserva (ver página 172 para las reglas sobre reservas) - puede ser hasta la mitad de las unidades del ejército del jugador, redondeando hacia abajo. El jugador también debe declarar qué unidades utilizan la regla especial Infiltrados y qué unidades comienzan la partida montadas en qué vehículo de transporte. El otro jugador hace lo mismo.
 Al comienzo de la partida no se coloca ninguna unidad sobre la mesa (excepto los infiltrados, véase más abajo). Las unidades que no queden en reserva forman la primera oleada del jugador.
 
@@ -904,6 +935,8 @@ A continuación, ambos jugadores ponen un dado de orden en la bolsa por cada uni
 
 En este juego, EL FLANQUEO NO ESTÁ PERMITIDO. En su lugar, todas las unidades que entren en la mesa como reservas pueden hacerlo desde cualquier punto del borde de la mesa que elijan - ¡cuidado!` };
 
+// ESCENARIOS DEL JUEGO BASE · Lista de nombres. El orden es el número del escenario
+// (el 1.º de la lista es el escenario 1, etc.).
 const baseScenarioNames = [
  'BUSCAR Y DESTRUIR',
  'POSICIONES CLAVE',
@@ -913,6 +946,7 @@ const baseScenarioNames = [
  'RESISTIR HASTA SER RELEVADOS'
 ];
 
+// Textos de los escenarios base. Deben estar en el MISMO ORDEN que baseScenarioNames.
 const baseScenarioTexts = [
 `El objetivo es sencillo: ambos bandos deben tratar de infligir el máximo daño al otro al tiempo que preservan sus propias fuerzas.
   
