@@ -1,3 +1,14 @@
+/* ==========================================================================
+   ESTILOS.CSS · ESTILOS BASE (diseño original)
+   ==========================================================================
+   Este archivo es la base y contiene muchas reglas acumuladas, algunas
+   repetidas. La web carga DESPUÉS css/tema-militar.css, que sobrescribe gran
+   parte de este diseño.
+   REGLA PRÁCTICA: para cambiar colores, botones, tipografías o aspecto de las
+   pantallas, edita css/tema-militar.css. Toca este archivo solo para cosas que
+   el tema no cubre (por ejemplo la imagen de fondo, que está en body:before).
+   ========================================================================== */
+
 :root{--bg:#171a17;--panel:rgba(18,22,19,.94);--line:#76613b;--gold:#c3a36a;--text:#eee9dc;--muted:#b9b3a5;--green:#626d3d;--red:#985454}
 *{box-sizing:border-box}body{margin:0;color:var(--text);font-family:Arial,Helvetica,sans-serif;background:#111 url('https://warlord-community.warlordgames.com/wp-content/uploads/2024/04/Bolt-Action-Article-Header.jpg') center/cover fixed no-repeat;min-height:100vh}
 body:before{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.63)),rgba(0,0,0,.35);z-index:-1}

@@ -1,26 +1,58 @@
 /* ==========================================================================
+   GUÍA RÁPIDA · ¿QUÉ CAMBIO Y DÓNDE?  (busca con Ctrl+F el texto entre comillas)
+   ==========================================================================
+   COLORES (cámbialos todos de golpe en ":root" justo debajo):
+     --o-950 … --o-600   verdes oliva, del más oscuro al más claro
+     --parch-100/200/300 pergamino (fondo claro de los paneles)
+     --sand-top/bot      arena de los botones (degradado de arriba a abajo)
+     --edge / --edge-dark  bordes dorados
+     --ink               color del texto oscuro   · --cream  texto claro
+     --red-army / --green-army  colores de Jugador 2 / Jugador 1
+   SECCIONES (buscar):
+     "Cabecera / título"     título grande BOLT ACTION FANMADE
+     "Paneles"               cajas de cada pantalla y su barra de título
+     "Pantallas oscuras"     qué pantallas son oliva y cuáles pergamino
+     "Botones"               botones arena y botones de menú
+     "Pantalla de inicio"    menú principal
+     "Facciones"             reglas de facciones
+     "Formularios"           nombres y dados iniciales (− / +)
+     "Ronda / bolsa"         contadores J1/J2 y cuadro de extracción
+     "Ajuste de dados"       pantalla de dados de la siguiente ronda
+     "Final de partida"      reloj y resultado
+     "Barra superior fija"   iconos de volver e inicio
+     "Ventanas modales"      ventanas emergentes
+     "Móvil"                 ajustes para pantallas pequeñas
+   TRUCOS:
+     • border-radius = redondeo de esquinas (más px = más redondo).
+     • Un color nuevo: usa un código tipo #3a4429 (hay selectores de color online).
+     • Si un cambio no se nota, puede que estilos.css lo esté forzando con
+       !important; copia la regla aquí con !important.
+   ========================================================================== */
+
+/* ==========================================================================
    BOLT ACTION FANMADE · tema "panel militar"
    Se carga DESPUÉS de estilos.css y lo sobrescribe. No toca la lógica.
    Para volver al diseño anterior: quita el <link> a este archivo en index.html.
    ========================================================================== */
 
 :root{
-  --o-950:#14180f;
+  --o-950:#14180f;   /* oliva casi negro (fondos muy oscuros) */
   --o-900:#1c2214;
   --o-800:#272f1c;
   --o-700:#364127;
-  --o-600:#4a5832;
-  --parch-100:#eadfc0;
-  --parch-200:#d8c79c;
+  --o-600:#4a5832;   /* oliva más claro (cabecera de facciones) */
+  --parch-100:#eadfc0; /* pergamino claro: arriba del degradado de los paneles */
+  --parch-200:#d8c79c; /* pergamino medio: abajo del degradado */
   --parch-300:#c4af7e;
-  --sand-top:#dcc99b;
-  --sand-bot:#b89d68;
-  --edge:#8d7d55;
+  --sand-top:#dcc99b;  /* arena clara: parte alta de los botones y color de iconos */
+  --sand-bot:#b89d68;  /* arena oscura: parte baja de los botones */
+  --edge:#8d7d55;      /* borde dorado de paneles */
   --edge-dark:#5d5238;
-  --ink:#1d1a11;
+  --ink:#1d1a11;       /* texto oscuro sobre pergamino y botones arena */
   --cream:#f1e9d2;
-  --red-army:#7a2f33;
-  --green-army:#2f5a35;
+  --red-army:#7a2f33;  /* granate: Jugador 2 */
+  --green-army:#2f5a35;/* verde: Jugador 1 */
+  /* TIPOGRAFÍAS: primero la preferida; si no carga, la siguiente de la lista */
   --font-title:'Oswald','Bebas Neue','Arial Narrow',Impact,sans-serif;
   --font-body:'Barlow','Segoe UI',Arial,sans-serif;
   --grain:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),
@@ -444,4 +476,62 @@ footer{font-family:var(--font-body);color:#d9cfb4;text-shadow:1px 2px 4px #000}
 @media (prefers-reduced-motion:reduce){
   button,.menu-button{transition:none}
   .curtain.lift{animation-duration:.01s}
+}
+
+/* ---------- Escritorio: centrar bien el menú de inicio ---------- */
+@media(min-width:561px){
+  body[data-screen="home"] #view{padding-left:0}
+}
+
+/* ==========================================================================
+   Barra superior fija: VOLVER (izquierda) e INICIO (derecha), solo iconos.
+   Siempre visible aunque se haga scroll; no tapa el contenido.
+   ========================================================================== */
+.nav-stack,
+body[data-screen] .nav-stack{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:auto !important;
+  margin:0 !important;
+  padding:calc(8px + env(safe-area-inset-top,0px)) 10px 0 !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:0 !important;
+  z-index:50 !important;
+  pointer-events:none;           /* la franja no bloquea toques ni clics */
+}
+.nav-button,
+body[data-screen] .nav-button{
+  pointer-events:auto;           /* solo los botones responden */
+  width:44px !important;
+  height:44px !important;
+  min-height:44px !important;
+  padding:0 !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+}
+.nav-svg{
+  width:26px;
+  height:26px;
+  fill:none;
+  stroke:var(--sand-top);
+  stroke-width:2.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 1px 1px #000);
+}
+.nav-button:hover .nav-svg{stroke:#f3e2b4}
+
+/* Hueco arriba para que el contenido no quede bajo los iconos */
+body:not([data-screen="home"]) #app{padding-top:64px}
+body[data-screen="draw"] #app{padding-top:62px !important}
+body:not([data-screen="home"]) header{padding-top:0}
+@media(max-width:560px){
+  body:not([data-screen="home"]) #app{padding-top:62px}
 }
