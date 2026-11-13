@@ -195,7 +195,7 @@ function rulesDetail(){const cat=state.ruleCategory,name=state.ruleName,body=spe
 //    hay un botón 'ABRIR PDF' que lo abre en una pestaña nueva (se oculta el marco).
 function rulesPdf(){
   view.innerHTML=`<section class="panel pdf-panel"><h2>REFERENCIA REGLAS</h2>
-  <a class="pdf-open-button" href="${REGLAS_PDF}" target="_blank" rel="noopener">ABRIR PDF EN PESTAÑA NUEVA</a>
+  <a class="pdf-open-button" href="${REGLAS_PDF}" target="_blank" rel="noopener">REFERENCIAS RÁPIDAS</a>
   <iframe class="pdf-frame" src="${REGLAS_PDF}" title="Referencia de reglas"></iframe>
   <p class="pdf-note">Si no se ve el documento, usa el botón de arriba.</p></section>${backButton()}`;
 }
