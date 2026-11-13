@@ -574,3 +574,168 @@ body:not([data-screen="home"]) header{padding-top:0}
 @media (pointer:coarse){
   .pdf-frame,.pdf-note{display:none}   /* en móvil: solo el botón */
 }
+
+/* ==========================================================================
+   VERSIÓN ORDENADOR (pantallas de más de 560 px de ancho)
+   ==========================================================================
+   Objetivos: todos los paneles con el MISMO ancho y bien centrados, textos y
+   botones más grandes, y que la pantalla de extracción de dados quepa entera
+   sin hacer scroll.
+   CÓMO AJUSTAR:
+     - Ancho de las pantallas  → max-width de "#view" (860px / 960px)
+     - Ancho del menú de inicio → max-width de ".home-panel"
+     - Tamaño de textos/botones → bloque "min-width:900px" más abajo
+   ========================================================================== */
+@media (min-width:561px){
+  /* Quita el hueco de 78px de la izquierda (era de los antiguos botones laterales)
+     y fija una columna central común a todas las pantallas */
+  #view{
+    padding-left:0 !important;
+    width:100%;
+    max-width:860px;
+    margin:0 auto;
+  }
+  .panel{width:100%;box-sizing:border-box}
+  .home-panel{max-width:620px;margin:0 auto}
+
+  /* Título en una sola línea para ocupar menos altura */
+  header h1{white-space:nowrap;font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.05}
+  header{padding:14px 0 18px}
+  footer{margin-top:auto;padding-top:28px}
+
+  /* --- Pantalla de extracción de dados: ocupa toda la altura de la ventana --- */
+  body[data-screen="draw"]{height:100vh;overflow:hidden}
+  body[data-screen="draw"] #app{
+    height:100vh;
+    min-height:0;
+    max-height:100vh;
+    padding-bottom:18px;
+    overflow:hidden;
+  }
+  body[data-screen="draw"] header,
+  body[data-screen="draw"] footer{display:none}      /* se oculta el título para ganar espacio */
+  body[data-screen="draw"] #view{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  body[data-screen="draw"] .panel{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:18px;
+    overflow:auto;                                   /* si la ventana es muy baja, scroll interno */
+  }
+  body[data-screen="draw"] .dice-counters{flex:0 0 auto}
+  body[data-screen="draw"] .draw-area{
+    flex:1 1 auto;
+    height:auto;
+    min-height:160px;
+    max-height:none;
+    margin:0;
+    display:flex;
+  }
+  body[data-screen="draw"] .extracted-summary,
+  body[data-screen="draw"] .draw-actions,
+  body[data-screen="draw"] .dice-remove-action{flex:0 0 auto;margin:0}
+  body[data-screen="draw"] .draw-actions button{width:100%}
+  body[data-screen="draw"] .bottom-note{display:none}
+}
+
+/* ---------- Pantallas grandes (portátil y sobremesa): todo un poco más grande ---------- */
+@media (min-width:900px){
+  .panel h2{font-size:1.6rem;padding:18px 16px;margin-bottom:24px}
+  .panel{padding-left:26px;padding-right:26px;padding-bottom:28px}
+  .panel h2{margin-left:-26px;margin-right:-26px}
+
+  button,.menu-button{font-size:1.15rem}
+  .menu-button{min-height:66px;padding:16px 22px}
+  .home-panel{padding:24px}
+  .home-panel .menu-button{min-height:64px;font-size:1.25rem}
+  .home-panel .menu-button:first-child{min-height:84px;font-size:1.6rem}
+  .rule-menu-button{min-height:84px}
+
+  .scenario-list button{font-size:1.12rem;padding:16px 18px}
+  .scenario-content{font-size:1.15rem;line-height:1.7}
+  .faction-card-text{font-size:1.08rem;line-height:1.65}
+  .faction-card-title strong{font-size:1.15rem}
+  .faction-page-heading h2{font-size:2rem !important}
+
+  .field label{font-size:1.3rem}
+  input,.setup-name-input{font-size:1.15rem;padding:15px 16px}
+  .initial-dice-control{max-width:300px}
+  .initial-dice-control button{width:66px;height:58px;font-size:2rem}
+  .initial-dice-control strong{font-size:2.3rem}
+  .choice-row button{min-height:64px;font-size:1.25rem}
+
+  .turn-title{font-size:5.5rem;padding:46px 20px 26px}
+  .counter{padding:14px 10px;font-size:1.1rem}
+  .counter strong{font-size:2.6rem}
+  .counter small{font-size:.95rem}
+  body[data-screen="draw"] .draw-area .player-name{font-size:clamp(3rem,8vw,6rem)}
+  .draw-actions button{min-height:72px;font-size:1.4rem}
+  .extracted-summary{font-size:1.05rem;padding:14px}
+  .dice-remove-action button{font-size:.95rem;padding:10px 20px}
+
+  .player-adjust{padding:16px 18px}
+  .player-adjust .pname{font-size:1.2rem}
+  .player-adjust .count{font-size:2.4rem}
+  .player-adjust button{min-height:56px;font-size:1.8rem}
+  .count-instruction{font-size:1.15rem}
+
+  body[data-screen="winner"] #globalClock .clock-value{font-size:3.2rem}
+  .nav-button,body[data-screen] .nav-button{width:50px !important;height:50px !important;min-height:50px !important}
+  .nav-svg{width:30px;height:30px}
+  .nav-stack,body[data-screen] .nav-stack{padding:calc(12px + env(safe-area-inset-top,0px)) 16px 0 !important}
+  body:not([data-screen="home"]) #app{padding-top:76px}
+  body[data-screen="draw"] #app{padding-top:76px !important}
+  footer{font-size:1rem}
+}
+
+/* Pantallas muy grandes: columna algo más ancha */
+@media (min-width:1400px){
+  #view{max-width:960px}
+  .home-panel{max-width:680px}
+}
+
+/* ---------- Ordenador: ajustes finos ---------- */
+@media (min-width:900px){
+  /* CONFIGURAR PARTIDA en dos columnas: J1 a la izquierda, J2 a la derecha.
+     Orden en pantalla: nombre J1 | nombre J2 / dados J1 | dados J2 */
+  .setup-panel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:28px;
+    row-gap:6px;
+    align-content:start;
+  }
+  .setup-panel h2{grid-column:1 / -1}
+  .setup-panel .choice-row{grid-column:1 / -1}
+  .setup-panel .field{margin:0}
+  .setup-panel .initial-dice-control{max-width:100%}
+
+  /* Ajuste de dados de la siguiente ronda: nombre y número centrados */
+  .player-adjust > div{text-align:center}
+
+  /* Botones de elegir (resultado final, flanqueo...) con un ancho mínimo cómodo */
+  .choice-row button{min-width:170px}
+  /* Botón COMENZAR RONDA más grande */
+  body[data-screen="round-title"] .panel button{padding:18px 48px;font-size:1.45rem}
+}
+
+/* Más aire entre filas de la configuración (ordenador) */
+@media (min-width:900px){
+  .setup-panel{row-gap:16px}
+}
+
+/* ---------- Pantallas Full HD o mayores (1700px+): escala general mayor ----------
+   Subir el tamaño base (html font-size) agranda todo lo que va en 'rem'.
+   Si en tu monitor lo ves demasiado grande o pequeño, cambia el 19px. */
+@media (min-width:1700px){
+  html{font-size:19px}
+  #view{max-width:1100px}
+  .home-panel{max-width:760px}
+}
