@@ -24,6 +24,11 @@
 // ----- ATAJOS Y ESTADO ---------------------------------------------------------
 // $('#id') es un atajo para document.querySelector. 'view' es la zona <main id="view">
 // de index.html donde se dibuja cada pantalla.
+// ----- PDF DE REFERENCIA DE REGLAS ---------------------------------------------
+// Ruta del PDF que se abre en Reglas > REFERENCIA REGLAS.
+// Para usar otro archivo, cambia este texto (la ruta es relativa a index.html).
+// Ejemplos:  'pdf/reglas.pdf'   ·   'documentos/manual.pdf'
+const REGLAS_PDF = 'pdf/reglas.pdf';
 const $ = s => document.querySelector(s);
 const view = $('#view');
 // ESTADO: valores con los que empieza una partida nueva.
@@ -118,6 +123,7 @@ function render(){
   if(state.screen==='faction-detail') return factionDetail();
   if(state.screen==='rules-list') return rulesList();
   if(state.screen==='rules-detail') return rulesDetail();
+  if(state.screen==='rules-pdf') return rulesPdf();   // pantalla del PDF de referencia
   if(state.screen==='deployment-menu') return deploymentMenu();
   if(state.screen==='deployment-detail') return deploymentDetail();
   if(state.screen==='scenario-groups') return groups();
@@ -174,6 +180,8 @@ function rulesMenu(){view.innerHTML=`<section class="panel"><h2>REGLAS</h2><div 
  <button class="menu-button rule-menu-button" data-rule-category="REGLAS DE ARMAS"><span class="rule-menu-label">REGLAS DE ARMAS</span></button>
  <button class="menu-button rule-menu-button" data-rule-category="REGLAS DE UNIDADES"><span class="rule-menu-label">REGLAS DE UNIDADES</span></button>
  <button class="menu-button rule-menu-button" data-rule-category="REGLAS DE VEHÍCULOS"><span class="rule-menu-label">REGLAS DE VEHÍCULOS</span></button>
+  <!-- Botón que abre el PDF de referencia (pantalla 'rules-pdf') -->
+  <button class="menu-button rule-menu-button" data-action="rules-pdf"><span class="rule-menu-label">REFERENCIA REGLAS</span></button>
  </div></section>${backButton()}`}
 // LISTA DE REGLAS de una categoría (ordenadas alfabéticamente). Datos: specialRules.
 function rulesList(){const cat=state.ruleCategory;const entries=Object.entries(specialRules[cat]||{}).sort((a,b)=>a[0].localeCompare(b[0],'es'));view.innerHTML=`<section class="panel"><h2>${esc(cat)}</h2><div class="scenario-list">${entries.map(([name])=>`<button data-rule-name="${esc(name)}">${esc(name)}</button>`).join('')}</div></section>${backButton()}`}
@@ -181,6 +189,16 @@ function rulesList(){const cat=state.ruleCategory;const entries=Object.entries(s
 function rulesDetail(){const cat=state.ruleCategory,name=state.ruleName,body=specialRules[cat]?.[name]||'';view.innerHTML=`<section class="panel"><h2>${esc(name)}</h2><div class="scenario-content">${esc(body)}</div></section>${backButton()}`}
 
 // TIPO DE DESPLIEGUE: elección según el resultado de un dado D6 (1-3, 4-5, 6).
+// REFERENCIA REGLAS: muestra el PDF (ruta en REGLAS_PDF, arriba del todo).
+//  - En ordenador se ve dentro de la propia pantalla (<iframe>).
+//  - En móvil/tablet muchos navegadores no muestran PDFs incrustados, por eso
+//    hay un botón 'ABRIR PDF' que lo abre en una pestaña nueva (se oculta el marco).
+function rulesPdf(){
+  view.innerHTML=`<section class="panel pdf-panel"><h2>REFERENCIA REGLAS</h2>
+  <a class="pdf-open-button" href="${REGLAS_PDF}" target="_blank" rel="noopener">ABRIR PDF EN PESTAÑA NUEVA</a>
+  <iframe class="pdf-frame" src="${REGLAS_PDF}" title="Referencia de reglas"></iframe>
+  <p class="pdf-note">Si no se ve el documento, usa el botón de arriba.</p></section>${backButton()}`;
+}
 function deploymentMenu(){
  view.innerHTML=`<section class="panel"><h2>TIPO DE DESPLIEGUE</h2><p class="deployment-roll-prompt">TIRAR UN DADO D6</p><div class="deployment-options">
  <button class="menu-button" data-deployment="1-3"><strong>1-3: ENCUENTRO COMPROMETIDO</strong></button>
@@ -446,6 +464,7 @@ view.addEventListener('click',e=>{
  else if(a==='deployment-menu'){state.screen='deployment-menu';render()}
  else if(a==='rules-menu'){state.screen='rules-menu';render()}
  else if(a==='factions'){state.screen='factions';render()}
+ else if(a==='rules-pdf'){state.screen='rules-pdf';render()}   // abre REFERENCIA REGLAS
  else if(a==='resume'){state.screen=state.screenBeforePause||(state.bag&&state.bag.length?'draw':'round-title');state.resumeNotice=true;render()}
  else if(a==='go-home'){if(['draw','round-title','round-finished','count','finish-choice','winner'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
  // Botón REINICIAR PARTIDA y navegación Volver / Inicio / Continuar
