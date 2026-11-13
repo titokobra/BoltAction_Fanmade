@@ -1,29 +1,26 @@
+<!DOCTYPE html>
 <!--
   =============================================================================
   INDEX.HTML · PÁGINA PRINCIPAL (el "esqueleto" de la web)
   =============================================================================
-  Esta es la ÚNICA página. Las pantallas (inicio, ronda, reglas…) no están aquí:
-  las dibuja js/app.js dentro de <!-- ZONA DINÁMICA: aquí app.js dibuja la pantalla activa. Déjala vacía. -->
-<main id="view">.
+  Esta es la ÚNICA página. Las pantallas (inicio, ronda, reglas...) no están
+  aquí: las dibuja js/app.js dentro de la zona con id="view".
 
   ARCHIVOS QUE USA:
-    css/estilos.css       → estilos base (diseño original)
-    css/tema-militar.css  → tema verde oliva/arena; SOBRESCRIBE al anterior.
-                            Si quieres cambiar colores o botones, edita ESTE.
-    js/datos.js           → textos de escenarios, reglas y facciones
-    js/app.js             → lógica y pantallas
+    css/estilos.css       estilos base (diseño original)
+    css/tema-militar.css  tema verde oliva/arena; SOBRESCRIBE al anterior.
+                          Si quieres cambiar colores o botones, edita ESTE.
+    js/datos.js           textos de escenarios, reglas y facciones
+    js/app.js             logica y pantallas
+    pdf/reglas.pdf        PDF de "REFERENCIA REGLAS" (ruta en app.js, REGLAS_PDF)
 
-  QUÉ CAMBIAR AQUÍ:
-    • Nombre de la pestaña del navegador → <!-- Nombre que aparece en la pestaña del navegador -->
-<title>
-    • Título grande de la web y lema     → <!-- CABECERA: título grande y lema. Solo se ve en la pantalla de inicio en móvil. -->
-<header>
-    • Texto del pie (versión, autor)     → <!-- PIE DE PÁGINA: versión y autor. Cambia el texto, la versión y el nombre aquí. -->
-<footer>
-    • Texto de la ventana "¿Reiniciar?"  → <div id="resetConfirmModal">
+  QUE CAMBIAR AQUI:
+    - Nombre de la pestaña del navegador -> etiqueta title
+    - Título grande de la web y lema     -> etiqueta header
+    - Texto del pie (versión, autor)     -> etiqueta footer
+    - Texto de la ventana de reiniciar   -> bloque id="resetConfirmModal"
   =============================================================================
 -->
-<!DOCTYPE html>
 <html lang="es">
 <head>
 <!-- Codificación: permite tildes y ñ -->
@@ -32,10 +29,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Color de la barra del navegador en móvil (mismo oliva oscuro del tema) -->
 <meta name="theme-color" content="#1c2214">
+<!-- Nombre que aparece en la pestaña del navegador -->
 <title>BOLT ACTION FANMADE</title>
 <!-- TIPOGRAFÍAS de Google Fonts: Oswald (títulos y botones) y Barlow (textos).
      Necesitan internet. Sin conexión se usan fuentes del sistema (todo funciona igual).
-     Para cambiar de letra: cambia los nombres en la línea siguiente y también las
+     Para cambiar de letra: cambia los nombres en el enlace de abajo y también las
      variables --font-title y --font-body al principio de css/tema-militar.css -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,8 +58,11 @@
 </div>
 <!-- ====== CONTENEDOR GENERAL DE LA WEB ====== -->
 <div id="app">
+<!-- CABECERA: título grande y lema. Solo se ve en la pantalla de inicio en móvil. -->
 <header><h1>BOLT ACTION FANMADE</h1><p>ORDEN · ESTRATEGIA · VICTORIA</p></header>
+<!-- ZONA DINÁMICA: aquí app.js dibuja la pantalla activa. Déjala vacía. -->
 <main id="view"></main>
+<!-- PIE DE PÁGINA: versión y autor. Cambia el texto, la versión y el nombre aquí. -->
 <footer>Herramienta de apoyo para partidas de Bolt Action<br>Versión v 0.21 · Noviembre 2026<br><strong style="color:#f2c94c;font-weight:800;">Creado por TitoKobra</strong></footer>
 </div>
 <!-- SCRIPTS (el orden importa): primero los datos y después la lógica que los usa -->
