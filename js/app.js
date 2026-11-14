@@ -379,8 +379,9 @@ function flankingRevealModal(){if(!state.flankModal)return '';if(!state.flankSel
 // 1) ¿Elegimos la partida automáticamente? SÍ → autoMode · NO → zonePick
 // Para cambiar el mensaje, edita el texto del <h2>.
 function autoAsk(){
-  view.innerHTML=`<section class="panel"><h2>¿Quieres que elijamos la partida automáticamente?</h2>
-  <div class="choice-row">${btn('SÍ','auto-yes')}${btn('NO','auto-no')}</div></section>${backButton()}`;
+  view.innerHTML=`<section class="panel flow-panel"><h2>¿Que decidan los dados?</h2>
+  <p class="flow-intro">Sorteamos misión y despliegue al azar, o los eliges tú antes de desplegar las tropas.</p>
+  <div class="choice-row">${btn('SORTEAR','auto-yes')}${btn('ELEGIR A MANO','auto-no')}</div></section>${backButton()}`;
 }
 // 2) Si dijo SÍ: de dónde sacar la misión. Los textos de los botones se cambian aquí.
 function autoMode(){
@@ -451,20 +452,22 @@ function draw(){
 view.innerHTML=`<section class="panel"><div class="dice-counters"><div class="counter">${esc(state.p1)}<strong>${n1}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score1}</strong></div></div>
 <div class="counter player-2-counter">${esc(state.p2)}<strong>${n2}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score2}</strong></div></div></div>
  <div class="draw-area" id="drawArea" style="background:${state.last==='p1'?'var(--green)':state.last==='p2'?'var(--red)':'#272a22'}"><div class="player-name">${state.last?esc(state.last==='p1'?state.p1:state.p2):'¿QUIÉN ACTÚA?'}</div><div class="curtain ${state.reveal?'lift':''}" id="curtain"></div></div>
- <div class="extracted-summary" aria-live="polite">${state.resumeNotice&&state.last?`<div class="resume-notice ${state.last==='p1'?'player-1':'player-2'}"><span>LE TOCABA A</span><strong>${state.last==='p1'?'JUGADOR 1':'JUGADOR 2'}</strong></div>`:''}${state.drawn.length===0?'<strong>Todavía no se ha extraído ningún dado</strong>':`<strong>Dados extraídos: ${state.drawn.length} · Al agotarse la bolsa, termina la ronda.</strong>`}</div>
+ <div class="extracted-summary" aria-live="polite">${state.resumeNotice&&state.last?`<div class="resume-notice ${state.last==='p1'?'player-1':'player-2'}"><span>LE TOCABA A</span><strong>${state.last==='p1'?'JUGADOR 1':'JUGADOR 2'}</strong></div>`:''}${state.drawn.length===0?'<strong>Todavía no se ha extraído ningún dado</strong>':`<strong class="extracted-count">Dados extraídos: ${state.drawn.length}</strong><span class="extracted-note">Al agotarse la bolsa, termina la ronda.</span>`}</div>
  <div class="draw-actions">${state.bag.length?btn('SIGUIENTE DADO','next-die'):btn('FIN DE RONDA','end-round')}</div>
  <div class="dice-remove-action">${state.bag.length?btn('ELIMINAR DADO','open-remove-die'):''}</div>
 </section>
  ${state.removeDieOpen?`<div class="remove-modal" role="dialog" aria-modal="true" aria-labelledby="removeDieTitle"><div class="remove-modal-card"><h2 id="removeDieTitle">¿A qué jugador quieres eliminar un dado?</h2><div class="remove-modal-choices">${btn(esc(state.p1),'remove-p1','') .replace('<button ','<button '+(state.bag.includes('p1')?'':'disabled '))}${btn(esc(state.p2),'remove-p2','').replace('<button ','<button '+(state.bag.includes('p2')?'':'disabled '))}${btn('CANCELAR','cancel-remove-die','cancel-remove')}</div><p class="remove-help">El dado se resta inmediatamente de la bolsa de esta ronda y del contador visible. No modifica el recuento que se utilizará para preparar la siguiente ronda.</p></div></div>`:''}${flankingRevealModal()}${backButton()}`;
 }
 // DADOS PARA LA SIGUIENTE RONDA: cada jugador indica cuántos dados le quedan.
-function countScreen(){view.innerHTML=`<section class="panel"><h2>DADOS PARA LA SIGUIENTE RONDA</h2><p class="count-instruction">Indica cuántos dados tendrá cada jugador en la próxima ronda. No puedes superar los dados que tenía al comenzar esta ronda.</p>
+function countScreen(){view.innerHTML=`<section class="panel"><h2>DADOS PARA LA SIGUIENTE RONDA</h2><p class="count-instruction">Hecho el recuento de bajas, indica cuántos dados de orden conserva cada jugador para la próxima ronda. Las bajas no se recuperan: no puedes superar los dados con los que empezaste esta ronda.</p>
  ${adjustRow('p1',state.p1,state.remaining1)}<small class="muted">Máximo de ${esc(state.p1)}: ${state.roundStart1}</small>${adjustRow('p2',state.p2,state.remaining2)}<small class="muted">Máximo de ${esc(state.p2)}: ${state.roundStart2}</small>${state.countLimitNotice?`<p class="notice" role="alert">${esc(state.countLimitNotice)}</p>`:''}
  <div class="choice-row">${btn('CONFIRMAR Y CONTINUAR','confirm-count')}</div></section>${backButton()}`}
 // adjustRow(): una fila con nombre del jugador y botones − / + (se usa en countScreen).
 function adjustRow(id,name,val){return `<div class="player-adjust"><button data-adjust="${id}" data-delta="-1" aria-label="Restar">−</button><div><div class="pname">${esc(name)}</div><div class="count">${val}</div></div><button data-adjust="${id}" data-delta="1" aria-label="Sumar">+</button></div>`}
-// FINAL DE LA RONDA 6: pregunta si terminar o jugar una séptima ronda.
-function finishChoice(){view.innerHTML=`<section class="panel"><h2>FINAL DE LA RONDA 6</h2><p>¿Quieres terminar la partida o jugar una séptima ronda?</p><div class="choice-row">${btn('FIN DE PARTIDA','end-match')}${btn('RONDA 7','round-seven')}</div></section>${backButton()}`}
+// FINAL DE LA RONDA 6: ya hecho el recuento de puntos, pregunta si hay turno 7.
+//   FIN DE PARTIDA   -> pantalla final (no se cuentan dados porque no hay más rondas)
+//   JUGAR TURNO 7    -> pantalla de dados para la siguiente ronda y después RONDA 7
+function finishChoice(){view.innerHTML=`<section class="panel flow-panel"><h2>FINAL DE LA RONDA 6</h2><p class="flow-intro">Recuento hecho. ¿Se da por terminada la batalla o se juega un turno 7?</p><div class="choice-row">${btn('FIN DE PARTIDA','end-match')}${btn('JUGAR TURNO 7','round-seven')}</div></section>${backButton()}`}
 // PARTIDA FINALIZADA: duración total, selección del resultado (J1 / J2 / EMPATE)
 // y botón VOLVER.
 function winner(){
@@ -502,7 +505,7 @@ function roundFinished(){
  view.innerHTML=`
  <section class="panel">
   <div class="round-finish-area">
-   <div class="round-finish-title">RONDA ${state.round} FINALIZADA</div>
+   <div class="round-finish-title">Recuento de puntos de Victoria de la Ronda ${state.round}</div>
    <div class="curtain" id="finishCurtain"></div>
   </div>
   <h2 class="score-heading">PUNTUACIÓN DE CADA JUGADOR</h2>
@@ -513,7 +516,7 @@ function roundFinished(){
   <div class="draw-actions score-continue">
    ${btn('CONTINUAR','continue-round')}
   </div>
- </section>`;
+ </section>${backButton()}`;   // backButton(): iconos de volver e inicio, como en el resto de la web
  requestAnimationFrame(()=>{
   const c=$('#finishCurtain');
   if(c)c.classList.add('lift')
@@ -666,6 +669,9 @@ function continueRound(){
  if(state.round===7){
   state.timerStoppedAt=Date.now();
   state.screen='winner';
+ }else if(state.round===6){
+  // Tras el recuento de la ronda 6 se pregunta si hay turno 7 (los dados se cuentan solo si lo hay)
+  state.screen='finish-choice';
  }else{
   state.remaining1=0;
   state.remaining2=0;
@@ -675,8 +681,8 @@ function continueRound(){
  save();
  render();
 }
-// confirmCount(): confirma los dados. En la ronda 6 pregunta si acabar; si no, sube de ronda.
-function confirmCount(){if(state.round===6){state.screen='finish-choice'}else{state.round++;state.screen='round-title'}render()}
+// confirmCount(): confirma los dados y pasa a la siguiente ronda (la pregunta del turno 7 ya se hizo antes).
+function confirmCount(){state.round++;state.screen='round-title';render()}
 // ----- REINICIAR PARTIDA (ventana de confirmación definida en index.html) ------
 // resetMatch abre la ventana · closeResetModal la cierra · confirmResetMatch borra todo.
 function resetMatch(){const modal=$('#resetConfirmModal');if(modal)modal.classList.add('open')}
@@ -813,7 +819,7 @@ else if(a==='end-match'){
  state.screen='winner';
  render();
 }
- else if(a==='round-seven'){state.round=7;state.screen='round-title';render()}
+ else if(a==='round-seven'){state.remaining1=0;state.remaining2=0;state.countLimitNotice='';state.screen='count';render()}   // turno 7: primero se cuentan los dados
  // --- Pantalla final: elegir resultado y volver ---
  else if(a==='win-p1'){state.winner=state.p1;render()}
  else if(a==='win-p2'){state.winner=state.p2;render()}
@@ -832,7 +838,7 @@ else if(a==='end-match'){
  else if(b.dataset.group){state.group=b.dataset.group;if(b.dataset.group==='ESCENARIOS JUEGO BASE')state.screen='base-scenario-list';else state.screen='scenario-list';render()}
  else if(b.dataset.baseScenario){state.baseScenario=b.dataset.baseScenario;state.screen='base-scenario-detail';render()}
  else if(b.dataset.scenario){state.scenario=b.dataset.scenario;state.screen='scenario-detail';render()}
- else if(b.dataset.adjust){const player=b.dataset.adjust, key=player==='p1'?'remaining1':'remaining2',limit=player==='p1'?state.roundStart1:state.roundStart2,next=state[key]+Number(b.dataset.delta);if(next>limit){state.countLimitNotice='NO PUEDES ELEGIR MAS DADOS QUE TU ANTERIOR RONDA';}else{state[key]=clamp(next,0,limit);state.countLimitNotice='';}render()}
+ else if(b.dataset.adjust){const player=b.dataset.adjust, key=player==='p1'?'remaining1':'remaining2',limit=player==='p1'?state.roundStart1:state.roundStart2,next=state[key]+Number(b.dataset.delta);if(next>limit){state.countLimitNotice='Sin refuerzos: no puedes tener más dados de orden que al empezar la ronda.';}else{state[key]=clamp(next,0,limit);state.countLimitNotice='';}render()}
 });
 render();
 updateGlobalClock();
