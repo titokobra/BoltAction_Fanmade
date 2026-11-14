@@ -465,46 +465,84 @@ function finishChoice(){view.innerHTML=`<section class="panel"><h2>FINAL DE LA R
 // PARTIDA FINALIZADA: duración total, selección del resultado (J1 / J2 / EMPATE)
 // y botón VOLVER.
 function winner(){
-  const result =
-    state.score1 > state.score2 ? state.p1 :
-    state.score2 > state.score1 ? state.p2 :
-    'EMPATE';
+ const result=state.score1>state.score2?state.p1:state.score2>state.score1?state.p2:'EMPATE';
+ state.winner=result;
 
-  state.winner = result;
+ view.innerHTML=`
+ <section class="panel winner-panel" style="text-align:center">
+  <h2>PARTIDA FINALIZADA</h2>
 
-  view.innerHTML=`
-    <section class="panel winner-panel" style="text-align:center">
-      <h2>PARTIDA FINALIZADA</h2>
-
-      <h3 class="winner-announcement">
-        ${result === 'EMPATE'
-          ? '¡PARTIDA EMPATADA!'
-          : `¡ENHORABUENA, ${esc(result)}!`}
-      </h3>
-
-      <div class="winner-scores">
-        <div>
-          <span>${esc(state.p1)}</span>
-          <strong>${state.score1}</strong>
-        </div>
-        <div>
-          <span>${esc(state.p2)}</span>
-          <strong>${state.score2}</strong>
-        </div>
-      </div>
-      <div id="globalClock" aria-live="off" style="position:static;display:flex;flex-direction:column;align-items:center;margin:20px auto;width:max-content;max-width:100%;">
+  <div id="globalClock" aria-live="off" style="position:static;display:flex;flex-direction:column;align-items:center;margin:20px auto;width:max-content;max-width:100%;">
    <span class="clock-label">DURACIÓN TOTAL DE LA PARTIDA</span>
    <span class="clock-value" id="clockValue">00:00:00</span>
-</div>
+  </div>
 
-      ${btn('VOLVER','home-finished')}
-    </section>
-  `;
+  <h3 class="winner-announcement">
+   ${result==='EMPATE'?'¡PARTIDA EMPATADA!':`¡ENHORABUENA, ${esc(result)}!`}
+  </h3>
 
-  updateGlobalClock();
+  <div class="winner-scores">
+   <div><span>${esc(state.p1)}</span><strong>${state.score1}</strong></div>
+   <div><span>${esc(state.p2)}</span><strong>${state.score2}</strong></div>
+  </div>
+
+  <div class="choice-row" style="justify-content:center">
+   ${btn('VOLVER','home-finished')}
+  </div>
+ </section>`;
+
+ updateGlobalClock();
+}
 }
 // RONDA FINALIZADA: pantalla intermedia al agotarse la bolsa.
-function roundFinished(){view.innerHTML=`<section class="panel"><div class="round-finish-area"><div class="round-finish-title">RONDA ${state.round} FINALIZADA</div><div class="curtain" id="finishCurtain"></div></div><div class="draw-actions">${btn('CONTINUAR','continue-round')}</div></section>`;requestAnimationFrame(()=>{const c=$('#finishCurtain');if(c)c.classList.add('lift')})}
+// RONDA FINALIZADA: muestra el resultado de la ronda y permite actualizar puntos.
+function roundFinished(){
+
+ view.innerHTML=`
+
+ <section class="panel">
+
+   <div class="round-finish-area">
+
+     <div class="round-finish-title">
+       RONDA ${state.round} FINALIZADA
+     </div>
+
+     <div class="curtain" id="finishCurtain"></div>
+
+   </div>
+
+   <h2 class="score-heading">
+     PUNTUACIÓN DE CADA JUGADOR
+   </h2>
+
+   <div class="score-board">
+
+     ${scoreRow('p1',state.p1,state.score1)}
+
+     ${scoreRow('p2',state.p2,state.score2)}
+
+   </div>
+
+   <div class="draw-actions score-continue">
+
+     ${btn('CONTINUAR','continue-round')}
+
+   </div>
+
+ </section>
+
+ `;
+
+ requestAnimationFrame(()=>{
+
+   const c=$('#finishCurtain');
+
+   if(c)c.classList.add('lift');
+
+ });
+
+}
 // =============================================================================
 // ACCIONES DEL JUEGO (la lógica: no dibujan pantallas, cambian el estado)
 // =============================================================================
