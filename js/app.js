@@ -36,7 +36,7 @@ const view = $('#view');
 //   screen=pantalla actual · p1/p2=nombres · d1/d2=dados iniciales (por defecto 8)
 //   round=ronda actual · remaining1/2=dados que quedan · bag=bolsa de dados
 //   drawn=dados ya sacados · last=último jugador que actuó · winner=resultado final
-const initialState = () => ({screen:'home',p1:'',p2:'',d1:8,d2:8,round:1,remaining1:8,remaining2:8,bag:[],drawn:[],last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1: 0,score2: 0});
+const initialState = () => ({screen:'home',p1:'',p2:'',d1:8,d2:8,round:1,remaining1:8,remaining2:8,bag:[],drawn:[],last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,scoreApplied:false});
 // Recupera la partida guardada en el navegador (localStorage) o crea una nueva.
 let state = JSON.parse(localStorage.getItem('ba_state') || 'null') || initialState();
 // ----- HISTORIAL DEL NAVEGADOR -------------------------------------------------
@@ -68,6 +68,9 @@ if (state.countLimitNotice === undefined) state.countLimitNotice = '';
 if (state.matchSetup === undefined) state.matchSetup = {};// misión/despliegue elegidos (nuevo)
 if (state.score1 === undefined) state.score1 = 0;
 if (state.score2 === undefined) state.score2 = 0;
+if(state.roundScore1===undefined)state.roundScore1=0;
+if(state.roundScore2===undefined)state.roundScore2=0;
+if(state.scoreApplied===undefined)state.scoreApplied=false;
 // ----- FUNCIONES AUXILIARES ----------------------------------------------------
 // save(): guarda el estado en el navegador (para no perder la partida al recargar).
 function save(){try{localStorage.setItem('ba_state',JSON.stringify(state))}catch(e){console.warn('No se pudo guardar el estado de la partida',e)}}
@@ -496,51 +499,25 @@ function winner(){
 // RONDA FINALIZADA: pantalla intermedia al agotarse la bolsa.
 // RONDA FINALIZADA: muestra el resultado de la ronda y permite actualizar puntos.
 function roundFinished(){
-
  view.innerHTML=`
-
  <section class="panel">
-
-   <div class="round-finish-area">
-
-     <div class="round-finish-title">
-       RONDA ${state.round} FINALIZADA
-     </div>
-
-     <div class="curtain" id="finishCurtain"></div>
-
-   </div>
-
-   <h2 class="score-heading">
-     PUNTUACIÓN DE CADA JUGADOR
-   </h2>
-
-   <div class="score-board">
-
-     ${scoreRow('p1',state.p1,state.score1)}
-
-     ${scoreRow('p2',state.p2,state.score2)}
-
-   </div>
-
-   <div class="draw-actions score-continue">
-
-     ${btn('CONTINUAR','continue-round')}
-
-   </div>
-
- </section>
-
- `;
-
+  <div class="round-finish-area">
+   <div class="round-finish-title">RONDA ${state.round} FINALIZADA</div>
+   <div class="curtain" id="finishCurtain"></div>
+  </div>
+  <h2 class="score-heading">PUNTUACIÓN DE CADA JUGADOR</h2>
+  <div class="score-board">
+   ${scoreRow('p1',state.p1,state.roundScore1)}
+   ${scoreRow('p2',state.p2,state.roundScore2)}
+  </div>
+  <div class="draw-actions score-continue">
+   ${btn('CONTINUAR','continue-round')}
+  </div>
+ </section>`;
  requestAnimationFrame(()=>{
-
-   const c=$('#finishCurtain');
-
-   if(c)c.classList.add('lift');
-
+  const c=$('#finishCurtain');
+  if(c)c.classList.add('lift')
  });
-
 }
 // =============================================================================
 // ACCIONES DEL JUEGO (la lógica: no dibujan pantallas, cambian el estado)
@@ -636,6 +613,7 @@ state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d
 state.winner=null;
 state.score1=0;
 state.score2=0;
+state.scoreApplied=false;
 state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
@@ -660,6 +638,20 @@ function endRound(){if(state.bag.length)return;state.screen='round-finished';ren
 // continueRound(): tras la ronda. Si era la 7, termina la partida y para el reloj;
 // si no, va a la pantalla para indicar los dados de la siguiente ronda.
 function continueRound(){
+
+ if(state.scoreApplied)return;
+
+ // Sumar los puntos de esta ronda al marcador total.
+ state.score1+=Number(state.roundScore1||0);
+ state.score2+=Number(state.roundScore2||0);
+
+ // Marcar la puntuación como aplicada para evitar duplicados.
+ state.scoreApplied=true;
+
+ // Preparar los puntos provisionales de la siguiente ronda.
+ state.roundScore1=0;
+ state.roundScore2=0;
+
  if(state.round===7){
   state.timerStoppedAt=Date.now();
   state.screen='winner';
@@ -668,6 +660,8 @@ function continueRound(){
   state.remaining2=0;
   state.screen='count';
  }
+
+ save();
  render();
 }
 // confirmCount(): confirma los dados. En la ronda 6 pregunta si acabar; si no, sube de ronda.
@@ -791,16 +785,14 @@ else if(b.dataset.diceAdjust){
   const index=state.bag.indexOf(who);
   if(index!==-1){state.bag.splice(index,1);state.removeDieOpen=false;save();render()}
  }
-    else if(b.dataset.score){
-  const key = b.dataset.score === 'p1' ? 'score1' : 'score2';
+else if(b.dataset.score){
+  const key=b.dataset.score==='p1'?'roundScore1':'roundScore2';
 
-  state[key] = Math.max(
-    0,
-    Number(state[key] || 0) + Number(b.dataset.delta)
-  );
-
-  save();
-  render();
+  if(state.screen==='round-finished' && !state.scoreApplied){
+    state[key]=Math.max(0,Number(state[key]||0)+Number(b.dataset.delta));
+    save();
+    render();
+  }
 }
  else if(a==='end-round')endRound()
  else if(a==='continue-round')continueRound()
