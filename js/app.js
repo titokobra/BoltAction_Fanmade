@@ -36,7 +36,7 @@ const view = $('#view');
 //   screen=pantalla actual · p1/p2=nombres · d1/d2=dados iniciales (por defecto 8)
 //   round=ronda actual · remaining1/2=dados que quedan · bag=bolsa de dados
 //   drawn=dados ya sacados · last=último jugador que actuó · winner=resultado final
-const initialState = () => ({screen:'home',p1:'',p2:'',d1:8,d2:8,round:1,remaining1:8,remaining2:8,bag:[],drawn:[],last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,scoreApplied:false});
+const initialState = () => ({screen:'home',p1:'',p2:'',d1:12,d2:12,round:1,remaining1:12,remaining2:12,bag:[],drawn:[],last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,scoreApplied:false});
 // Recupera la partida guardada en el navegador (localStorage) o crea una nueva.
 let state = JSON.parse(localStorage.getItem('ba_state') || 'null') || initialState();
 // ----- HISTORIAL DEL NAVEGADOR -------------------------------------------------
@@ -608,8 +608,8 @@ function newBag(){state.roundStart1=state.remaining1;state.roundStart2=state.rem
 // begin(): se ejecuta al pulsar CONTINUAR en la configuración. Arranca el reloj,
 // guarda nombres (si están vacíos usa 'Jugador 1/2') y limita los dados entre 1 y 18.
 function begin(){state.timerStartedAt=Date.now();
-state.timerStoppedAt=null;state.p1=$('#p1').value.trim()||'Jugador 1';state.p2=$('#p2').value.trim()||'Jugador 2';state.d1=clamp(state.d1,1,18);
-state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;
+state.timerStoppedAt=null;state.p1=$('#p1').value.trim()||'Jugador 1';state.p2=$('#p2').value.trim()||'Jugador 2';state.d1=clamp(state.d1,1,50);
+state.d2=clamp(state.d2,1,50);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;
 state.winner=null;
 state.score1=0;
 state.score2=0;
@@ -698,8 +698,8 @@ view.addEventListener('input',e=>{
  const el=e.target;
  if(el.id==='p1'){state.p1=el.value;save()}
  else if(el.id==='p2'){state.p2=el.value;save()}
- else if(el.id==='d1'){state.d1=clamp(+el.value,1,18);save()}
- else if(el.id==='d2'){state.d2=clamp(+el.value,1,18);save()}
+else if(el.id==='d1'){state.d1=clamp(+el.value,1,50);save()}
+else if(el.id==='d2'){state.d2=clamp(+el.value,1,50);save()}
 });
 // Botón 'atrás' del navegador/móvil: vuelve a la pantalla anterior de la app.
 window.addEventListener('popstate',e=>{
@@ -765,8 +765,8 @@ else if(a==='begin'){
 else if(b.dataset.diceAdjust){
   const key=b.dataset.diceAdjust;
   const delta=Number(b.dataset.delta);
-  state[key]=clamp(state[key]+delta,1,18);
-  render();
+state[key]=clamp(state[key]+delta,1,50);
+   render();
 }
  // --- Nueva partida: elección automática / manual de misión y despliegue ---
  else if(a==='auto-yes'){state.screen='auto-mode';render()}
