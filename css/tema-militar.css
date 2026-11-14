@@ -739,3 +739,83 @@ body:not([data-screen="home"]) header{padding-top:0}
   #view{max-width:1100px}
   .home-panel{max-width:760px}
 }
+
+/* ==========================================================================
+   NUEVA PARTIDA · pantallas de elección de misión y despliegue
+   ==========================================================================
+   .flow-options  → lista vertical de botones (partida automática, zona, tipo)
+   .flow-note     → nota pequeña bajo los botones (tipo de despliegue)
+   .result-*      → resultado del sorteo: nombre de la misión y recuadros de
+                    ZONA y TIPO de despliegue (oscuros, como los contadores)
+   Los botones SÍ / NO / COMENZAR PARTIDA usan el estilo normal de botón
+   (.choice-row). El título de cada pregunta es el <h2> de la pantalla.
+   ========================================================================== */
+.flow-options{display:grid;grid-template-columns:1fr;gap:12px}
+.flow-options .menu-button{
+  justify-content:center;
+  text-align:center;
+  min-height:64px;
+  font-size:1.1rem;
+}
+.flow-note{
+  margin:20px 4px 0;
+  font-size:.9rem;
+  font-style:italic;
+  text-align:center;
+  color:#5d5238;
+}
+/* Títulos largos (las preguntas) en la barra superior: que no se salgan */
+.panel h2{line-height:1.25}
+
+.result-mission{margin:0 0 14px}
+.result-label{
+  display:block;
+  font-family:var(--font-title);
+  font-size:.85rem;
+  letter-spacing:.16em;
+  color:#5d5238;
+}
+.result-mission h3{font-size:1.55rem;margin:4px 0 0;line-height:1.2}
+
+.result-chips{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px}
+.result-chip{
+  background:var(--grain),linear-gradient(180deg,var(--o-700),var(--o-900));
+  border:1px solid var(--edge);
+  border-radius:6px;
+  padding:14px 12px;
+  text-align:center;
+  color:var(--cream);
+  box-shadow:inset 0 0 14px rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.3);
+}
+.result-chip span{
+  display:block;
+  font-family:var(--font-title);
+  font-size:.78rem;
+  letter-spacing:.14em;
+  color:var(--sand-top);
+}
+.result-chip strong{
+  display:block;
+  font-family:var(--font-title);
+  font-size:1.15rem;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  margin:6px 0 2px;
+}
+.result-chip small{color:#cfc5aa;font-size:.8rem}
+@media(max-width:560px){
+  .result-chips{grid-template-columns:1fr}
+  .result-mission h3{font-size:1.35rem}
+}
+@media(min-width:900px){
+  .flow-options .menu-button{min-height:74px;font-size:1.25rem}
+  .flow-note{font-size:1rem}
+  .result-mission h3{font-size:1.9rem}
+  .result-chip strong{font-size:1.3rem}
+  /* SÍ / NO bien visibles en ordenador */
+  body[data-screen="auto-ask"] .choice-row button{min-height:84px;font-size:1.6rem}
+}
+
+/* SÍ / NO y COMENZAR PARTIDA ocupan todo el ancho (ordenador y móvil) */
+body[data-screen="auto-ask"] .choice-row button{flex:1}
+body[data-screen="auto-result"] .choice-row button{width:100%;min-height:68px;font-size:1.25rem}
