@@ -266,8 +266,8 @@ function zoneDetail(){
     }
   };
 
-  const zone = zones[state.zoneImage];
-
+const zone = zones[state.zoneImage] || zones.bordelargo;
+   
   view.innerHTML = `
     <section class="panel">
       <h2>${zone.title}</h2>
@@ -493,7 +493,6 @@ function winner(){
 
  updateGlobalClock();
 }
-}
 // RONDA FINALIZADA: pantalla intermedia al agotarse la bolsa.
 // RONDA FINALIZADA: muestra el resultado de la ronda y permite actualizar puntos.
 function roundFinished(){
@@ -637,7 +636,7 @@ state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d
 state.winner=null;
 state.score1=0;
 state.score2=0;
-;state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
+state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
 function clamp(v,a,b){return Math.max(a,Math.min(b,Number.isFinite(v)?v:a))}
