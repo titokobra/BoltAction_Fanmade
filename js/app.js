@@ -6,6 +6,7 @@
      "PANTALLAS"         → el HTML de cada pantalla (textos de botones y títulos)
      "ACCIONES DEL JUEGO"→ lo que ocurre al sacar dados, acabar ronda, etc.
      "CLICS"             → qué hace cada botón al pulsarlo (data-action="...")
+     "NUEVA PARTIDA"     → elección de misión y despliegue (automática o manual) tras CONTINUAR
 
    CÓMO FUNCIONA, EN BREVE:
      1. state.screen guarda la pantalla actual (p. ej. 'home', 'draw').
@@ -61,6 +62,7 @@ if (state.timerStoppedAt === undefined) state.timerStoppedAt = null;
 if (state.roundStart1 === undefined) state.roundStart1 = state.d1 || 8;
 if (state.roundStart2 === undefined) state.roundStart2 = state.d2 || 8;
 if (state.countLimitNotice === undefined) state.countLimitNotice = '';
+if (state.matchSetup === undefined) state.matchSetup = {};   // misión/despliegue elegidos (nuevo)
 // ----- FUNCIONES AUXILIARES ----------------------------------------------------
 // save(): guarda el estado en el navegador (para no perder la partida al recargar).
 function save(){try{localStorage.setItem('ba_state',JSON.stringify(state))}catch(e){console.warn('No se pudo guardar el estado de la partida',e)}}
@@ -133,6 +135,12 @@ function render(){
   if(state.screen==='scenario-detail') return scenarioDetail();
   if(state.screen==='setup') return setup();
 
+  // Nuevas pantallas del flujo de nueva partida (ver sección "NUEVA PARTIDA" más abajo)
+  if(state.screen==='auto-ask') return autoAsk();
+  if(state.screen==='auto-mode') return autoMode();
+  if(state.screen==='zone-pick') return zonePick();
+  if(state.screen==='deploy-pick') return deployPick();
+  if(state.screen==='auto-result') return autoResult();
   if(state.screen==='generating') return generating();
   if(state.screen==='round-title') return roundTitle();
   if(state.screen==='draw') return draw();
@@ -300,6 +308,69 @@ function setup(){
 function flankingAsk(){view.innerHTML=`<section class="panel"><h2>REGLAS DE FLANQUEO</h2><p>¿Se utilizarán las reglas de flanqueo en esta partida?</p><div class="choice-row">${btn('SÍ, UTILIZAR FLANQUEO','flanking-yes')}${btn('NO, SIN FLANQUEO','flanking-no')}</div></section>${backButton()}`}
 function flankingChoose(){const who=state.flankStep===1?'p1':'p2',name=who==='p1'?state.p1:state.p2,chosenText=state.flankPendingChoice?`<div class="flank-choice-confirmation">${esc(name)} eligió el flanqueo por la ${state.flankPendingChoice==='left'?'izquierda':'derecha'}.</div>`:'';view.innerHTML=`<section class="panel"><h2>ELECCIÓN DE FLANQUEO</h2><p><strong>${esc(name)}</strong></p><p>¿Por qué lado quieres realizar el flanqueo?</p><div class="flank-choice-grid"><button class="flank-choice ${state.flankPendingChoice==='left'?'selected':''}" data-action="choose-left"><span class="flank-arrow">←</span><span>Por tu izquierda</span></button><button class="flank-choice ${state.flankPendingChoice==='right'?'selected':''}" data-action="choose-right"><span class="flank-arrow">→</span><span>Por tu derecha</span></button></div>${chosenText}<div class="notice">Tu elección será privada y no se mostrará al otro jugador.</div><div class="choice-row">${btn('SIGUIENTE','confirm-flank-choice',state.flankPendingChoice?'':'')} </div></section>`}
 function flankingRevealModal(){if(!state.flankModal)return '';if(!state.flankSelected)return `<div class="remove-modal" role="dialog" aria-modal="true"><div class="remove-modal-card"><h2>¿Qué jugador quiere revelar su flanqueo?</h2><div class="remove-modal-choices">${!state.flankRevealed.p1?btn(esc(state.p1),'select-flank-p1'):''}${!state.flankRevealed.p2?btn(esc(state.p2),'select-flank-p2'):''}${btn('CANCELAR','cancel-flank')}</div></div></div>`;const name=state.flankSelected==='p1'?state.p1:state.p2;return `<div class="remove-modal" role="dialog" aria-modal="true"><div class="remove-modal-card"><h2>CONFIRMAR REVELACIÓN</h2><p>¿Estás seguro de que quieres revelar el flanqueo de ${esc(name)}?</p><p class="muted">La elección solo se mostrará si pulsas CONFIRMAR.</p><div class="remove-modal-choices">${btn('CONFIRMAR','confirm-flank-reveal')}${btn('CANCELAR','cancel-flank')}</div></div></div>`}
+// ----- NUEVA PARTIDA: PANTALLAS DE ELECCIÓN DE MISIÓN Y DESPLIEGUE -----------------
+// 1) ¿Elegimos la partida automáticamente? SÍ → autoMode · NO → zonePick
+// Para cambiar el mensaje, edita el texto del <h2>.
+function autoAsk(){
+  view.innerHTML=`<section class="panel"><h2>¿Quieres que elijamos la partida automáticamente?</h2>
+  <div class="choice-row">${btn('SÍ','auto-yes')}${btn('NO','auto-no')}</div></section>${backButton()}`;
+}
+// 2) Si dijo SÍ: de dónde sacar la misión. Los textos de los botones se cambian aquí.
+function autoMode(){
+  view.innerHTML=`<section class="panel"><h2>Partida automática</h2>
+  <div class="flow-options">
+   <button class="menu-button" data-action="auto-base">MISIONES JUEGO BASE</button>
+   <button class="menu-button" data-action="auto-pack">MISIONES 26 27</button>
+   <button class="menu-button" data-action="auto-both">AMBAS</button>
+   <button class="menu-button" data-action="auto-manual">MANUALMENTE</button>
+  </div></section>${backButton()}`;
+}
+// 3) Elección manual, paso 1: zona de despliegue (se guarda en state.matchSetup.zone)
+function zonePick(){
+  view.innerHTML=`<section class="panel"><h2>Selecciona zona de despliegue</h2>
+  <div class="flow-options">
+   <button class="menu-button" data-action="pick-zone" data-zone="1-3">${ZONE_LABELS['1-3']}</button>
+   <button class="menu-button" data-action="pick-zone" data-zone="4-6">${ZONE_LABELS['4-6']}</button>
+  </div></section>${backButton()}`;
+}
+// 4) Elección manual, paso 2: tipo de despliegue + nota pequeña debajo.
+// Al elegir uno se abre el resumen (autoResult) con lo elegido y el botón COMENZAR PARTIDA.
+function deployPick(){
+  view.innerHTML=`<section class="panel"><h2>¿Qué tipo de despliegue quieres seleccionar?</h2>
+  <div class="flow-options">
+   <button class="menu-button" data-action="pick-deploy" data-deploy="1-3">${DEPLOY_LABELS['1-3']}</button>
+   <button class="menu-button" data-action="pick-deploy" data-deploy="4-5">${DEPLOY_LABELS['4-5']}</button>
+   <button class="menu-button" data-action="pick-deploy" data-deploy="6">${DEPLOY_LABELS['6']}</button>
+  </div>
+  <p class="flow-note">Puedes consultar estas reglas en el menú principal seleccionando Tipo de despliegue.</p></section>${backButton()}`;
+}
+// 5) Resultado / resumen: misión sorteada (+ zona y tipo si es del juego base) o, en elección manual,
+//    la zona y el tipo elegidos. Siempre con el botón COMENZAR PARTIDA.
+function autoResult(){
+  const m=state.matchSetup||{};
+  // Elección MANUAL: no hay misión, solo la zona y el tipo que se han elegido (sin dado)
+  const manual=!m.src&&m.zone&&m.deploy;
+  if(!m.src&&!manual){state.screen='auto-mode';return render()}   // por seguridad si no hay nada guardado
+  let title='',text='',label='';
+  if(m.src==='base'){title=`${m.n}. ${baseScenarioNames[m.n-1]}`;text=baseScenarioTexts[m.n-1]||'';label='MISIÓN DEL JUEGO BASE'}
+  else if(m.src==='pack'){const sc=scenarioGroups[PACK_GROUP].find(x=>String(x[0])===String(m.n));title=`${sc[0]}. ${sc[1]}`;text=sc[2];label='MISIÓN PACK 26 27'}
+  // Línea "Dado: N" solo cuando el valor salió de un sorteo (en manual no se muestra)
+  const dado=r=>r?`<small>Dado: ${r}</small>`:'';
+  // Recuadros de zona y tipo: en juego base (sorteados) y en manual (elegidos).
+  // En misiones del pack no salen, porque ya traen su despliegue en el texto.
+  const chips=(m.src==='base'||manual)?`<div class="result-chips">
+    <div class="result-chip"><span>ZONA DE DESPLIEGUE</span><strong>${ZONE_LABELS[m.zone]}</strong>${dado(m.zoneRoll)}</div>
+    <div class="result-chip"><span>TIPO DE DESPLIEGUE</span><strong>${DEPLOY_LABELS[m.deploy]}</strong>${dado(m.deployRoll)}</div>
+  </div>`:'';
+  // Cabecera con el nombre de la misión (no existe en manual) y texto completo de la misión
+  const head=manual?'':`<div class="result-mission"><span class="result-label">${label}</span><h3>${esc(title)}</h3></div>`;
+  const body=manual?'':`<div class="scenario-content">${esc(text)}</div>`;
+  view.innerHTML=`<section class="panel"><h2>${manual?'Resumen de la partida':'Partida automática'}</h2>
+  ${head}
+  ${chips}
+  ${body}
+  <div class="choice-row">${btn('COMENZAR PARTIDA','launch')}</div></section>${backButton()}`;
+}
 // PANTALLA 'GENERANDO DADOS ALEATORIOS' (transición corta).
 function generating(){view.innerHTML=`<section class="panel" style="text-align:center;padding:60px 20px"><h2>GENERANDO DADOS ALEATORIOS</h2><p class="muted">Preparando la bolsa de dados…</p></section>`;setTimeout(()=>{if(state.screen==='generating'){state.screen='round-title';render()}},900)}
 // TÍTULO DE RONDA: muestra 'RONDA N' y el botón COMENZAR RONDA.
@@ -363,12 +434,71 @@ function roundFinished(){view.innerHTML=`<section class="panel"><div class="roun
 // ACCIONES DEL JUEGO (la lógica: no dibujan pantallas, cambian el estado)
 // =============================================================================
 // newBag(): llena la bolsa con tantos dados de cada jugador como le queden y la mezcla.
+// =============================================================================
+// NUEVA PARTIDA · ELECCIÓN DE MISIÓN Y DESPLIEGUE (automática o manual)
+// =============================================================================
+// FLUJO (empieza al pulsar CONTINUAR en CONFIGURAR PARTIDA):
+//   auto-ask   → "¿Quieres que elijamos la partida automáticamente?"  SÍ / NO
+//     NO  → zone-pick (zona de despliegue) → deploy-pick (tipo de despliegue) → auto-result (resumen) → RONDA 1
+//     SÍ  → auto-mode: MISIONES JUEGO BASE / MISIONES 26 27 / AMBAS / MANUALMENTE
+//             BASE  → misión al azar de las 6 + zona y tipo al azar → auto-result
+//             26 27 → misión al azar de las 25 (ya traen su despliegue)  → auto-result
+//             AMBAS → una al azar entre las 31 (6 base + 25 del pack)    → auto-result
+//             MANUALMENTE → igual que NO (zone-pick → deploy-pick)
+//   auto-result → botón COMENZAR PARTIDA → RONDA 1
+// El resultado se guarda en state.matchSetup = {src,n,zone,zoneRoll,deploy,deployRoll}
+//   src='base' (juego base) o 'pack' (26 27) · n=número de misión · zone/deploy=claves de abajo.
+
+// Nombre EXACTO del grupo de misiones 26 27 en datos.js > scenarioGroups.
+// Si algún día lo renombras allí, cámbialo aquí también.
+const PACK_GROUP = 'PACK MISIONES 26 27';
+
+// Textos de las zonas de despliegue (clave = rango del dado D6). Cambia aquí los nombres.
+const ZONE_LABELS = {'1-3':'1-3: BORDE LARGO','4-6':'4-6: CUADRANTES'};
+// Textos de los tipos de despliegue. Deben coincidir con las claves de deploymentRules (datos.js).
+const DEPLOY_LABELS = {'1-3':'1-3: ENCUENTRO COMPROMETIDO','4-5':'4-5: POSICIONES PREPARADAS','6':'6: NIEBLA DE GUERRA'};
+
+// d6(): simula un dado de 6 caras (1-6).
+function d6(){return 1+Math.floor(Math.random()*6)}
+// rollDeployment(m): tira un D6 para la zona (1-3 borde largo, 4-6 cuadrantes) y otro D6 para el
+// tipo (1-3 encuentro comprometido, 4-5 posiciones preparadas, 6 niebla de guerra).
+function rollDeployment(m){
+  m.zoneRoll=d6();m.zone=m.zoneRoll<=3?'1-3':'4-6';
+  m.deployRoll=d6();m.deploy=m.deployRoll<=3?'1-3':(m.deployRoll<=5?'4-5':'6');
+  return m;
+}
+// rollBase(n): misión del juego base (al azar, o la número n si se indica) + zona y tipo al azar.
+function rollBase(n){
+  const total=baseScenarioNames.length;
+  return rollDeployment({src:'base',n:n||1+Math.floor(Math.random()*total)});
+}
+// rollPack(i): misión del pack 26 27 (al azar, o la posición i de la lista si se indica).
+// Estas misiones ya llevan su despliegue definido en su texto, así que no se tira nada más.
+function rollPack(i){
+  const list=scenarioGroups[PACK_GROUP];
+  const sc=list[i==null?Math.floor(Math.random()*list.length):i];
+  return {src:'pack',n:sc[0]};
+}
+// rollBoth(): todas las misiones en un mismo saco (6 base + 25 del pack), cada una con la misma
+// probabilidad. Si sale una del juego base, se le tiran también zona y tipo de despliegue.
+function rollBoth(){
+  const nb=baseScenarioNames.length,np=scenarioGroups[PACK_GROUP].length;
+  const k=Math.floor(Math.random()*(nb+np));
+  return k<nb?rollBase(k+1):rollPack(k-nb);
+}
+// launchMatch(): se pulsa COMENZAR PARTIDA (o se termina la elección manual). Arranca el reloj
+// de la partida y pasa a 'GENERANDO DADOS' → RONDA 1.
+function launchMatch(){
+  state.timerStartedAt=Date.now();state.timerStoppedAt=null;
+  state.screen='generating';render();
+}
+
 function newBag(){state.roundStart1=state.remaining1;state.roundStart2=state.remaining2;state.countLimitNotice='';state.bag=[];for(let i=0;i<state.remaining1;i++)state.bag.push('p1');for(let i=0;i<state.remaining2;i++)state.bag.push('p2');state.bag.sort(()=>Math.random()-.5);state.drawn=[];state.last=null;state.reveal=false;state.removeDieOpen=false}
 // begin(): se ejecuta al pulsar CONTINUAR en la configuración. Arranca el reloj,
 // guarda nombres (si están vacíos usa 'Jugador 1/2') y limita los dados entre 1 y 18.
 function begin(){state.timerStartedAt=Date.now();
 state.timerStoppedAt=null;state.p1=$('#p1').value.trim()||'Jugador 1';state.p2=$('#p2').value.trim()||'Jugador 2';state.d1=clamp(state.d1,1,18);
-state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;state.winner=null;state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.screen='generating';render()}
+state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;state.winner=null;state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.screenBeforePause=null;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
 function clamp(v,a,b){return Math.max(a,Math.min(b,Number.isFinite(v)?v:a))}
@@ -466,7 +596,7 @@ view.addEventListener('click',e=>{
  else if(a==='factions'){state.screen='factions';render()}
  else if(a==='rules-pdf'){state.screen='rules-pdf';render()}   // abre REFERENCIA REGLAS
  else if(a==='resume'){state.screen=state.screenBeforePause||(state.bag&&state.bag.length?'draw':'round-title');state.resumeNotice=true;render()}
- else if(a==='go-home'){if(['draw','round-title','round-finished','count','finish-choice','winner'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
+ else if(a==='go-home'){if(['draw','round-title','round-finished','count','finish-choice','winner','auto-ask','auto-mode','zone-pick','deploy-pick','auto-result'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
  // Botón REINICIAR PARTIDA y navegación Volver / Inicio / Continuar
  else if(a==='reset')resetMatch()
   else if(a==='back'){
@@ -488,6 +618,15 @@ else if(b.dataset.diceAdjust){
   state[key]=clamp(state[key]+delta,1,18);
   render();
 }
+ // --- Nueva partida: elección automática / manual de misión y despliegue ---
+ else if(a==='auto-yes'){state.screen='auto-mode';render()}
+ else if(a==='auto-no'||a==='auto-manual'){state.matchSetup={};state.screen='zone-pick';render()}
+ else if(a==='pick-zone'){state.matchSetup=state.matchSetup||{};state.matchSetup.zone=b.dataset.zone;state.screen='deploy-pick';render()}
+ else if(a==='pick-deploy'){state.matchSetup=state.matchSetup||{};state.matchSetup.deploy=b.dataset.deploy;state.screen='auto-result';render()}   // resumen antes de empezar
+ else if(a==='auto-base'){state.matchSetup=rollBase();state.screen='auto-result';render()}
+ else if(a==='auto-pack'){state.matchSetup=rollPack();state.screen='auto-result';render()}
+ else if(a==='auto-both'){state.matchSetup=rollBoth();state.screen='auto-result';render()}
+ else if(a==='launch')launchMatch()
  // --- Flanqueo ---
  else if(a==='flanking-yes'){state.flankingEnabled=true;state.flankStep=1;state.screen='flanking-choose';render()}
  else if(a==='flanking-no'){state.flankingEnabled=false;state.screen='generating';render()}
