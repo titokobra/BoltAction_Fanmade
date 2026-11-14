@@ -634,7 +634,18 @@ function nextDie(){
  },120);
 }
 // endRound(): cuando la bolsa está vacía, pasa a 'RONDA FINALIZADA'.
-function endRound(){if(state.bag.length)return;state.screen='round-finished';render()}
+function endRound(){
+ if(state.bag.length)return;
+
+ // Preparar la puntuación de la nueva ronda.
+ state.roundScore1=0;
+ state.roundScore2=0;
+ state.scoreApplied=false;
+
+ state.screen='round-finished';
+ save();
+ render();
+}
 // continueRound(): tras la ronda. Si era la 7, termina la partida y para el reloj;
 // si no, va a la pantalla para indicar los dados de la siguiente ronda.
 function continueRound(){
