@@ -131,6 +131,8 @@ function render(){
   if(state.screen==='rules-detail') return rulesDetail();
   if(state.screen==='rules-pdf') return rulesPdf();   // pantalla del PDF de referencia
   if(state.screen==='deployment-menu') return deploymentMenu();
+  if(state.screen==='zones-menu') return zonesMenu();
+  if(state.screen==='zone-detail') return zoneDetail();
   if(state.screen==='deployment-detail') return deploymentDetail();
   if(state.screen==='scenario-groups') return groups();
   if(state.screen==='base-scenario-list') return baseScenarioList();
@@ -163,6 +165,7 @@ function home(){
  <button class="menu-button" data-action="start">COMENZAR PARTIDA</button>
  <button class="menu-button" data-action="reset">REINICIAR PARTIDA</button>
  <button class="menu-button" data-action="scenario-groups">ELECCIÓN DE ESCENARIOS</button>
+ <button class="menu-button" data-action="zones-menu">ZONAS DE DESPLIEGUE</button>
  <button class="menu-button" data-action="deployment-menu">TIPO DE DESPLIEGUE</button>
  <button class="menu-button" data-action="rules-menu">REGLAS</button>
  </div>${state.active?`<div class="home-actions">${btn('CONTINUAR PARTIDA','resume')}</div>`:''}</section>${startWarnOpen?startWarnModal():''}`;
@@ -217,6 +220,48 @@ function deploymentMenu(){
  <button class="menu-button" data-deployment="4-5"><strong>4-5: POSICIONES PREPARADAS</strong></button>
  <button class="menu-button" data-deployment="6"><strong>6: NIEBLA DE GUERRA</strong></button>
  </div></section>${backButton()}`;
+}
+// ZONAS DE DESPLIEGUE
+function zonesMenu(){
+ view.innerHTML=`
+ <section class="panel">
+   <h2>ZONAS DE DESPLIEGUE</h2>
+   <div class="deployment-options">
+     <button class="menu-button" data-zone="bordelargo">
+       BORDE LARGO
+     </button>
+     <button class="menu-button" data-zone="cuadrantes">
+       CUADRANTES
+     </button>
+   </div>
+ </section>
+ ${backButton()}`;
+}
+// FOTOGRAFÍAS DE ZONAS DE DESPLIEGUE
+function zoneDetail(){
+ const zones = {
+   bordelargo: {
+     title: 'BORDE LARGO',
+     image: 'images/bordelargo.png'
+   },
+   cuadrantes: {
+     title: 'CUADRANTES',
+     image: 'images/cuadrantes.png'
+   }
+ };
+
+ const zone = zones[state.zoneImage];
+
+ view.innerHTML = `
+ <section class="panel">
+   <h2>${zone.title}</h2>
+   <img
+     src="${zone.image}"
+     alt="${zone.title}"
+     class="deployment-zone-image"
+   >
+ </section>
+ ${backButton()}`;
 }
 // DETALLE DEL DESPLIEGUE: los textos están en datos.js > deploymentRules.
 function deploymentDetail(){
@@ -621,6 +666,10 @@ view.addEventListener('click',e=>{
  else if(a==='start-cancel'){startWarnOpen=false;render()}                          // NO del aviso: no pasa nada
  else if(a==='scenario-groups'){state.screen='scenario-groups';render()}
  else if(a==='deployment-menu'){state.screen='deployment-menu';render()}
+    else if(a==='zones-menu'){
+ state.screen='zones-menu';
+ render();
+}
  else if(a==='rules-menu'){state.screen='rules-menu';render()}
  else if(a==='factions'){state.screen='factions';render()}
  else if(a==='rules-pdf'){state.screen='rules-pdf';render()}   // abre REFERENCIA REGLAS
@@ -694,6 +743,11 @@ else if(a==='end-match'){
  else if(b.dataset.ruleCategory){state.ruleCategory=b.dataset.ruleCategory;state.screen='rules-list';render()}
  else if(b.dataset.ruleName){state.ruleName=b.dataset.ruleName;state.screen='rules-detail';render()}
  else if(b.dataset.deployment){state.deploymentType=b.dataset.deployment;state.screen='deployment-detail';render()}
+    else if(b.dataset.zone){
+ state.zoneImage=b.dataset.zone;
+ state.screen='zone-detail';
+ render();
+}
  else if(b.dataset.group){state.group=b.dataset.group;if(b.dataset.group==='ESCENARIOS JUEGO BASE')state.screen='base-scenario-list';else state.screen='scenario-list';render()}
  else if(b.dataset.baseScenario){state.baseScenario=b.dataset.baseScenario;state.screen='base-scenario-detail';render()}
  else if(b.dataset.scenario){state.scenario=b.dataset.scenario;state.screen='scenario-detail';render()}
