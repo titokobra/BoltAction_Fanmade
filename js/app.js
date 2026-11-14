@@ -239,16 +239,30 @@ function zonesMenu(){
 }
 // FOTOGRAFÍAS DE ZONAS DE DESPLIEGUE
 function zoneDetail(){
- const zones = {
-   bordelargo: {
-     title: 'BORDE LARGO',
-     image: 'images/bordelargo.png'
-   },
-   cuadrantes: {
-     title: 'CUADRANTES',
-     image: 'images/cuadrantes.png'
-   }
- };
+  const zones = {
+    bordelargo: {
+      title: 'BORDE LARGO',
+      image: 'images/bordelargo.png',
+      description: '<strong>1-3: BORDES LARGOS</strong><br>Divide la mesa en dos mitades, según el mapa de abajo. Ambos jugadores tiran un dado. El que obtenga mayor puntuación elige una zona de despliegue como propia; el adversario obtiene la contraria.'
+    },
+    cuadrantes: {
+      title: 'CUADRANTES',
+      image: 'images/cuadrantes.png',
+      description: '<strong>4-6: CUADRANTES</strong><br>Divide la mesa en cuadrantes, según el mapa de abajo. Ambos jugadores tiran un dado. El jugador con mayor puntuación elige un cuadrante como zona de despliegue propia; el adversario, el contrario.'
+    }
+  };
+
+  const zone = zones[state.zoneImage];
+
+  view.innerHTML = `
+    <section class="panel">
+      <h2>${zone.title}</h2>
+      <img src="${zone.image}" alt="${zone.title}" class="deployment-zone-image">
+      <p class="deployment-zone-description">${zone.description}</p>
+    </section>
+    ${backButton()}
+  `;
+}
 
  const zone = zones[state.zoneImage];
 
