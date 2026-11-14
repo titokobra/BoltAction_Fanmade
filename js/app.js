@@ -43,6 +43,9 @@ let state = JSON.parse(localStorage.getItem('ba_state') || 'null') || initialSta
 // Permite que el botón 'atrás' del móvil/navegador vaya a la pantalla anterior
 // de la app en vez de salir de la web.
 // Historial de navegación de la aplicación
+// Aviso "Ya tienes una partida en curso" (ventana de la pantalla de inicio).
+// Es una variable normal y NO va dentro de state, para que no se guarde: si se recarga la web, no reaparece.
+let startWarnOpen = false;
 let lastRenderedScreen = state.screen;
 let appHistoryDepth = 0;
 
@@ -119,6 +122,7 @@ function render(){
   updateGlobalClock();
   save();
   document.body.dataset.screen = state.screen;
+  if(state.screen!=='home') startWarnOpen=false;   // el aviso de partida en curso solo vive en el inicio
   if(state.screen==='home') return home();
   if(state.screen==='rules-menu') return rulesMenu();
   if(state.screen==='factions') return factions();
@@ -161,7 +165,7 @@ function home(){
  <button class="menu-button" data-action="scenario-groups">ELECCIÓN DE ESCENARIOS</button>
  <button class="menu-button" data-action="deployment-menu">TIPO DE DESPLIEGUE</button>
  <button class="menu-button" data-action="rules-menu">REGLAS</button>
- </div>${state.active?`<div class="home-actions">${btn('CONTINUAR PARTIDA','resume')}</div>`:''}</section>`;
+ </div>${state.active?`<div class="home-actions">${btn('CONTINUAR PARTIDA','resume')}</div>`:''}</section>${startWarnOpen?startWarnModal():''}`;
 }
 // LISTA DE FACCIONES (Reglas > Reglas de facciones). Se genera sola a partir de
 // factionRules en datos.js: para añadir un ejército, añádelo allí.
@@ -434,6 +438,27 @@ function roundFinished(){view.innerHTML=`<section class="panel"><div class="roun
 // ACCIONES DEL JUEGO (la lógica: no dibujan pantallas, cambian el estado)
 // =============================================================================
 // newBag(): llena la bolsa con tantos dados de cada jugador como le queden y la mezcla.
+// ----- AVISO "YA TIENES UNA PARTIDA EN CURSO" ---------------------------------------
+// hasGameInProgress(): ¿hay una partida real empezada y sin terminar?
+//   - state.active        → se empezó una partida
+//   - state.launched      → ya se pulsó COMENZAR PARTIDA (false mientras se está eligiendo misión/despliegue)
+//   - timerStartedAt      → el reloj está en marcha
+//   - !timerStoppedAt     → todavía no se ha terminado (en la pantalla final el reloj se para)
+// Si quieres que el aviso salga en más situaciones, cambia las condiciones de aquí.
+function hasGameInProgress(){
+  return !!(state.active && state.launched!==false && state.timerStartedAt && !state.timerStoppedAt);
+}
+// startWarnModal(): ventana emergente con el aviso. Para cambiar el mensaje, edita el texto del <p>.
+//   SÍ  → continúa y abre CONFIGURAR PARTIDA (la partida anterior se pierde al pulsar CONTINUAR allí)
+//   NO  → cierra la ventana y no pasa nada (se mantiene la partida en curso)
+function startWarnModal(){
+  return `<div class="remove-modal" role="dialog" aria-modal="true" aria-labelledby="startWarnTitle"><div class="remove-modal-card">
+  <h2 id="startWarnTitle">PARTIDA EN CURSO</h2>
+  <p class="start-warn-text">Ya tienes una partida en curso. Si pulsas en comenzar partida de nuevo, perderás la partida anterior. ¿Quieres continuar?</p>
+  <div class="remove-modal-choices start-warn-choices">${btn('SÍ','start-confirm')}${btn('NO','start-cancel','cancel-remove')}</div>
+  </div></div>`;
+}
+
 // =============================================================================
 // NUEVA PARTIDA · ELECCIÓN DE MISIÓN Y DESPLIEGUE (automática o manual)
 // =============================================================================
@@ -490,6 +515,7 @@ function rollBoth(){
 // de la partida y pasa a 'GENERANDO DADOS' → RONDA 1.
 function launchMatch(){
   state.timerStartedAt=Date.now();state.timerStoppedAt=null;
+  state.launched=true;   // a partir de aquí cuenta como 'partida en curso'
   state.screen='generating';render();
 }
 
@@ -498,7 +524,7 @@ function newBag(){state.roundStart1=state.remaining1;state.roundStart2=state.rem
 // guarda nombres (si están vacíos usa 'Jugador 1/2') y limita los dados entre 1 y 18.
 function begin(){state.timerStartedAt=Date.now();
 state.timerStoppedAt=null;state.p1=$('#p1').value.trim()||'Jugador 1';state.p2=$('#p2').value.trim()||'Jugador 2';state.d1=clamp(state.d1,1,18);
-state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;state.winner=null;state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.screenBeforePause=null;state.screen='auto-ask';render()}
+state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;state.winner=null;state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
 function clamp(v,a,b){return Math.max(a,Math.min(b,Number.isFinite(v)?v:a))}
@@ -589,7 +615,10 @@ document.getElementById('resetConfirmModal').addEventListener('click',e=>{
 view.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
  const a=b.dataset.action;
- if(a==='start'){state.screen='setup';render()}
+ // COMENZAR PARTIDA (inicio): si hay una partida en curso, pide confirmación antes de seguir
+ if(a==='start'){if(hasGameInProgress()){startWarnOpen=true;render()}else{state.screen='setup';render()}}
+ else if(a==='start-confirm'){startWarnOpen=false;state.screen='setup';render()}   // SÍ del aviso
+ else if(a==='start-cancel'){startWarnOpen=false;render()}                          // NO del aviso: no pasa nada
  else if(a==='scenario-groups'){state.screen='scenario-groups';render()}
  else if(a==='deployment-menu'){state.screen='deployment-menu';render()}
  else if(a==='rules-menu'){state.screen='rules-menu';render()}
