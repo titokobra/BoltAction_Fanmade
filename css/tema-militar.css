@@ -603,14 +603,26 @@ body:not([data-screen="home"]) header{padding-top:0}
   header{padding:14px 0 18px}
   footer{margin-top:auto;padding-top:28px}
 
-  /* --- Pantalla de extracción de dados: ocupa toda la altura de la ventana --- */
-  body[data-screen="draw"]{height:100vh;overflow:hidden}
+  /* --- Pantalla de extracción de dados: ocupa como mínimo toda la ventana visible ---
+     IMPORTANTE (tablets y móviles en horizontal): NO se bloquea el scroll ni se fija la altura
+     con 100vh. En esos navegadores 100vh es la altura SIN las barras del navegador, y el borde
+     inferior (botón ELIMINAR DADO) quedaba tapado y sin forma de llegar a él.
+     Ahora se usa 'min-height' con 100svh (la altura realmente visible, siempre) y la página
+     puede hacer scroll normal si el contenido no cabe.
+     (100vh va primero como alternativa para navegadores antiguos que no entienden svh.) */
+  body[data-screen="draw"]{
+    height:auto;
+    min-height:100vh;
+    min-height:100svh;
+    overflow:visible;
+  }
   body[data-screen="draw"] #app{
-    height:100vh;
-    min-height:0;
-    max-height:100vh;
-    padding-bottom:18px;
-    overflow:hidden;
+    height:auto;
+    min-height:100vh;
+    min-height:100svh;
+    max-height:none;
+    padding-bottom:max(18px,env(safe-area-inset-bottom,0px));
+    overflow:visible;
   }
   body[data-screen="draw"] header,
   body[data-screen="draw"] footer{display:none}      /* se oculta el título para ganar espacio */
@@ -627,13 +639,14 @@ body:not([data-screen="home"]) header{padding-top:0}
     flex-direction:column;
     gap:14px;
     padding:18px;
-    overflow:auto;                                   /* si la ventana es muy baja, scroll interno */
+    overflow:visible;                                /* sin scroll interno: scrollea la página entera */
   }
   body[data-screen="draw"] .dice-counters{flex:0 0 auto}
   body[data-screen="draw"] .draw-area{
     flex:1 1 auto;
     height:auto;
-    min-height:160px;
+    min-height:clamp(180px,28vh,380px);              /* alto mínimo del cuadro grande de JUGADOR 1 / 2 */
+    min-height:clamp(180px,28svh,380px);
     max-height:none;
     margin:0;
     display:flex;
@@ -837,4 +850,53 @@ body[data-screen="auto-result"] .choice-row button{width:100%;min-height:68px;fo
 @media(min-width:900px){
   .remove-modal-card{width:min(100%,520px);padding:30px}
   .start-warn-text{font-size:1.12rem}
+}
+
+/* ==========================================================================
+   TEXTOS NUEVOS · pregunta de partida automática, dados extraídos, recuento de puntos
+   ==========================================================================
+   - .flow-intro        : frase simpática bajo el título (pregunta automática y turno 7)
+   - #view padding-top  : baja el contenido de todas las pantallas (menos inicio y dados) para
+                          que los iconos fijos de volver/inicio no tapen los títulos.
+                          Si aún los ves pegados, sube el 14px (y el 22px de ".flow-panel").
+   - .extracted-count / .extracted-note : "Dados extraídos: N" y, en otro párrafo, el aviso
+   - .round-finish-title: título "Recuento de puntos de Victoria de la Ronda N" (ajustado a 2-3 líneas)
+   ========================================================================== */
+body:not([data-screen="home"]):not([data-screen="draw"]) #view{padding-top:14px}
+.flow-panel{margin-top:22px}
+.flow-intro{
+  margin:6px 4px 24px;
+  text-align:center;
+  font-size:1.08rem;
+  line-height:1.6;
+}
+body[data-screen="finish-choice"] .flow-intro{color:var(--cream)}
+
+/* Dados extraídos: dos párrafos centrados, con un salto entre ellos */
+.extracted-summary{text-align:center}
+.extracted-count{display:block}
+.extracted-note{
+  display:block;
+  margin-top:14px;
+  font-weight:600;
+  line-height:1.4;
+}
+
+/* Título de la pantalla de recuento de puntos (texto largo, centrado y que no se corte) */
+.round-finish-title{
+  width:100%;
+  box-sizing:border-box;
+  padding:0 22px;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  line-height:1.25;
+  font-family:var(--font-title);
+  font-weight:700;
+  font-size:clamp(1.35rem,5.2vw,2.3rem);
+}
+@media(min-width:900px){
+  .flow-intro{font-size:1.2rem}
+  .extracted-note{font-size:1.02rem}
+  .round-finish-title{font-size:2.6rem}
 }
