@@ -36,7 +36,7 @@ const view = $('#view');
 //   screen=pantalla actual · p1/p2=nombres · d1/d2=dados iniciales (por defecto 8)
 //   round=ronda actual · remaining1/2=dados que quedan · bag=bolsa de dados
 //   drawn=dados ya sacados · last=último jugador que actuó · winner=resultado final
-const initialState = () => ({screen:'home',p1:'',p2:'',d1:8,d2:8,round:1,remaining1:8,remaining2:8,bag:[],drawn:[],last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:''});
+const initialState = () => ({screen:'home',p1:'',p2:'',d1:8,d2:8,round:1,remaining1:8,remaining2:8,bag:[],drawn:[],last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1: 0,score2: 0});
 // Recupera la partida guardada en el navegador (localStorage) o crea una nueva.
 let state = JSON.parse(localStorage.getItem('ba_state') || 'null') || initialState();
 // ----- HISTORIAL DEL NAVEGADOR -------------------------------------------------
@@ -65,7 +65,9 @@ if (state.timerStoppedAt === undefined) state.timerStoppedAt = null;
 if (state.roundStart1 === undefined) state.roundStart1 = state.d1 || 8;
 if (state.roundStart2 === undefined) state.roundStart2 = state.d2 || 8;
 if (state.countLimitNotice === undefined) state.countLimitNotice = '';
-if (state.matchSetup === undefined) state.matchSetup = {};   // misión/despliegue elegidos (nuevo)
+if (state.matchSetup === undefined) state.matchSetup = {};// misión/despliegue elegidos (nuevo)
+if (state.score1 === undefined) state.score1 = 0;
+if (state.score2 === undefined) state.score2 = 0;
 // ----- FUNCIONES AUXILIARES ----------------------------------------------------
 // save(): guarda el estado en el navegador (para no perder la partida al recargar).
 function save(){try{localStorage.setItem('ba_state',JSON.stringify(state))}catch(e){console.warn('No se pudo guardar el estado de la partida',e)}}
@@ -74,6 +76,18 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 // btn(texto, acción, clase): crea un botón HTML. 'acción' es el data-action que
 // luego se gestiona en la sección de CLICS.
 function btn(label,fn,cls=''){return `<button class="${cls}" data-action="${fn}">${label}</button>`}
+function scoreRow(player, name, score){
+  return `
+    <div class="score-adjust ${player === 'p2' ? 'score-player-2' : ''}">
+      <div class="score-player-name">${esc(name)}</div>
+      <div class="score-controls">
+        <button data-score="${player}" data-delta="-1">−</button>
+        <strong>${score}</strong>
+        <button data-score="${player}" data-delta="1">+</button>
+      </div>
+    </div>
+  `;
+}
 // backButton(): dibuja la barra fija superior con los iconos de VOLVER (flecha)
 // e INICIO (casita). Para cambiar los iconos, edita los <path> de los SVG.
 // El aspecto (tamaño, color, posición) se cambia en css/tema-militar.css.
@@ -431,8 +445,8 @@ function roundTitle(){view.innerHTML=`<section class="panel"><div class="turn-ti
 function draw(){
  // Estos contadores reflejan los dados que quedan realmente dentro de la bolsa de esta ronda.
  const n1=state.bag.filter(x=>x==='p1').length,n2=state.bag.filter(x=>x==='p2').length;
- view.innerHTML=`<section class="panel"><div class="dice-counters"><div class="counter">${esc(state.p1)}<strong>${n1}</strong><small class="muted">dados en la bolsa</small></div>
- <div class="counter player-2-counter">${esc(state.p2)}<strong>${n2}</strong><small class="muted">dados en la bolsa</small></div></div>
+view.innerHTML=`<section class="panel"><div class="dice-counters"><div class="counter">${esc(state.p1)}<strong>${n1}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score1}</strong></div></div>
+<div class="counter player-2-counter">${esc(state.p2)}<strong>${n2}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score2}</strong></div></div></div>
  <div class="draw-area" id="drawArea" style="background:${state.last==='p1'?'var(--green)':state.last==='p2'?'var(--red)':'#272a22'}"><div class="player-name">${state.last?esc(state.last==='p1'?state.p1:state.p2):'¿QUIÉN ACTÚA?'}</div><div class="curtain ${state.reveal?'lift':''}" id="curtain"></div></div>
  <div class="extracted-summary" aria-live="polite">${state.resumeNotice&&state.last?`<div class="resume-notice ${state.last==='p1'?'player-1':'player-2'}"><span>LE TOCABA A</span><strong>${state.last==='p1'?'JUGADOR 1':'JUGADOR 2'}</strong></div>`:''}${state.drawn.length===0?'<strong>Todavía no se ha extraído ningún dado</strong>':`<strong>Dados extraídos: ${state.drawn.length} · Al agotarse la bolsa, termina la ronda.</strong>`}</div>
  <div class="draw-actions">${state.bag.length?btn('SIGUIENTE DADO','next-die'):btn('FIN DE RONDA','end-round')}</div>
@@ -451,32 +465,39 @@ function finishChoice(){view.innerHTML=`<section class="panel"><h2>FINAL DE LA R
 // PARTIDA FINALIZADA: duración total, selección del resultado (J1 / J2 / EMPATE)
 // y botón VOLVER.
 function winner(){
- view.innerHTML=`
- <section class="panel" style="text-align:center">
-  <h2>PARTIDA FINALIZADA</h2>
+  const result =
+    state.score1 > state.score2 ? state.p1 :
+    state.score2 > state.score1 ? state.p2 :
+    'EMPATE';
 
-  <div id="globalClock" aria-live="off"
-   style="position:static;display:flex;flex-direction:column;align-items:center;margin:20px auto;width:max-content;max-width:100%;">
-   <span class="clock-label">DURACIÓN TOTAL DE LA PARTIDA</span>
-   <span class="clock-value" id="clockValue">00:00:00</span>
-  </div>
+  state.winner = result;
 
-  <p>Selecciona el resultado:</p>
+  view.innerHTML=`
+    <section class="panel winner-panel" style="text-align:center">
+      <h2>PARTIDA FINALIZADA</h2>
 
-  <div class="choice-row" style="justify-content:center">
-   ${btn(esc(state.p1),'win-p1')}
-   ${btn(esc(state.p2),'win-p2')}
-   ${btn('EMPATE','win-draw')}
-  </div>
+      <h3 class="winner-announcement">
+        ${result === 'EMPATE'
+          ? '¡PARTIDA EMPATADA!'
+          : `¡ENHORABUENA, ${esc(result)}!`}
+      </h3>
 
-  ${state.winner?`<h3>RESULTADO: ${esc(state.winner)}</h3>`:''}
+      <div class="winner-scores">
+        <div>
+          <span>${esc(state.p1)}</span>
+          <strong>${state.score1}</strong>
+        </div>
+        <div>
+          <span>${esc(state.p2)}</span>
+          <strong>${state.score2}</strong>
+        </div>
+      </div>
 
-  <div class="choice-row" style="justify-content:center">
-   ${btn('VOLVER','home-finished')}
-  </div>
- </section>`;
+      ${btn('VOLVER','home-finished')}
+    </section>
+  `;
 
- updateGlobalClock();
+  updateGlobalClock();
 }
 // RONDA FINALIZADA: pantalla intermedia al agotarse la bolsa.
 function roundFinished(){view.innerHTML=`<section class="panel"><div class="round-finish-area"><div class="round-finish-title">RONDA ${state.round} FINALIZADA</div><div class="curtain" id="finishCurtain"></div></div><div class="draw-actions">${btn('CONTINUAR','continue-round')}</div></section>`;requestAnimationFrame(()=>{const c=$('#finishCurtain');if(c)c.classList.add('lift')})}
@@ -570,7 +591,11 @@ function newBag(){state.roundStart1=state.remaining1;state.roundStart2=state.rem
 // guarda nombres (si están vacíos usa 'Jugador 1/2') y limita los dados entre 1 y 18.
 function begin(){state.timerStartedAt=Date.now();
 state.timerStoppedAt=null;state.p1=$('#p1').value.trim()||'Jugador 1';state.p2=$('#p2').value.trim()||'Jugador 2';state.d1=clamp(state.d1,1,18);
-state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;state.winner=null;state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
+state.d2=clamp(state.d2,1,18);state.remaining1=state.d1;state.remaining2=state.d2;state.roundStart1=state.d1;state.roundStart2=state.d2;state.countLimitNotice='';state.round=1;
+state.winner=null;
+state.score1=0;
+state.score2=0;
+;state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
 function clamp(v,a,b){return Math.max(a,Math.min(b,Number.isFinite(v)?v:a))}
@@ -725,6 +750,17 @@ else if(b.dataset.diceAdjust){
   const index=state.bag.indexOf(who);
   if(index!==-1){state.bag.splice(index,1);state.removeDieOpen=false;save();render()}
  }
+    else if(b.dataset.score){
+  const key = b.dataset.score === 'p1' ? 'score1' : 'score2';
+
+  state[key] = Math.max(
+    0,
+    Number(state[key] || 0) + Number(b.dataset.delta)
+  );
+
+  save();
+  render();
+}
  else if(a==='end-round')endRound()
  else if(a==='continue-round')continueRound()
  else if(a==='confirm-count')confirmCount()
