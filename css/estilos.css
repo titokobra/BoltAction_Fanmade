@@ -314,3 +314,144 @@ footer{color:#f2e7d2;text-shadow:1px 2px 4px #000}
   line-height: 1.6;
   font-size: 1rem;
 }
+/* ---------- PUNTUACIÓN ACUMULADA DE LA PARTIDA ---------- */
+
+.counter-score {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(226,205,158,.35);
+    font-size: .9rem;
+    color: #f0e3c7;
+}
+
+.counter-score strong {
+    display: inline !important;
+    margin-left: 4px;
+    font-size: 1.05rem !important;
+    color: #fff;
+    font-weight: 800;
+}
+
+.score-heading {
+    text-align: center;
+    margin: 22px 0 14px;
+}
+
+.score-board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0 20px;
+}
+
+.score-adjust {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 12px;
+    background: linear-gradient(145deg,#343c2b,#1c241a);
+    border: 1px solid #9d895f;
+    border-radius: 9px;
+    color: #fff5df;
+}
+
+.score-adjust.score-player-2 {
+    background: linear-gradient(145deg,#63352f,#351b1b);
+    border-color: #a56e60;
+}
+
+.score-player-name {
+    font-weight: 800;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.score-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.score-controls button {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.score-controls strong {
+    min-width: 42px;
+    text-align: center;
+    font-size: 1.8rem;
+}
+
+.winner-announcement {
+    margin: 24px 0;
+    font-size: clamp(1.6rem,5vw,2.5rem);
+    color: #f2d18a;
+}
+
+.winner-scores {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px auto;
+    max-width: 520px;
+}
+
+.winner-scores > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 10px;
+    background: rgba(0,0,0,.28);
+    border: 1px solid #9d895f;
+    border-radius: 8px;
+}
+
+.winner-scores > div:nth-child(2) {
+    border-color: #a56e60;
+}
+
+.winner-scores span {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.winner-scores strong {
+    font-size: 2rem;
+    color: #fff;
+}
+
+@media(max-width:560px) {
+    .score-board {
+        gap: 8px;
+    }
+
+    .score-adjust {
+        padding: 12px 6px;
+    }
+
+    .score-controls {
+        gap: 8px;
+    }
+
+    .score-controls button {
+        width: 40px;
+        height: 40px;
+        min-height: 40px;
+    }
+
+    .counter-score {
+        font-size: .78rem;
+    }
+
+    .winner-scores {
+        gap: 8px;
+    }
+}
