@@ -819,3 +819,22 @@ body:not([data-screen="home"]) header{padding-top:0}
 /* SÍ / NO y COMENZAR PARTIDA ocupan todo el ancho (ordenador y móvil) */
 body[data-screen="auto-ask"] .choice-row button{flex:1}
 body[data-screen="auto-result"] .choice-row button{width:100%;min-height:68px;font-size:1.25rem}
+
+/* ==========================================================================
+   AVISO "PARTIDA EN CURSO" (ventana al pulsar COMENZAR PARTIDA con una partida empezada)
+   Usa la misma ventana que "Eliminar dado" (.remove-modal / .remove-modal-card).
+   - .start-warn-text    : texto del aviso
+   - .start-warn-choices : botones SÍ / NO, uno al lado del otro
+   ========================================================================== */
+.start-warn-text{
+  margin:0 0 22px;
+  line-height:1.55;
+  font-size:1.02rem;
+  color:var(--cream);
+}
+.start-warn-choices{grid-template-columns:1fr 1fr;gap:12px}
+.start-warn-choices button{min-height:56px;font-size:1.15rem}
+@media(min-width:900px){
+  .remove-modal-card{width:min(100%,520px);padding:30px}
+  .start-warn-text{font-size:1.12rem}
+}
