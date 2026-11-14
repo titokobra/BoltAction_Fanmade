@@ -901,6 +901,7 @@ body[data-screen="finish-choice"] .flow-intro{color:var(--cream)}
   .round-finish-title{font-size:2.6rem}
 }
 /* IMÁGENES DE ZONAS DE DESPLIEGUE */
+
 .deployment-zone-image {
     display: block;
     width: 100%;
@@ -911,4 +912,6 @@ body[data-screen="finish-choice"] .flow-intro{color:var(--cream)}
     object-position: center;
     margin: 15px auto;
     border-radius: 8px;
+    background: #e5e5e5;
 }
+
