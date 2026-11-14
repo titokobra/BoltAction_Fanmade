@@ -492,6 +492,10 @@ function winner(){
           <strong>${state.score2}</strong>
         </div>
       </div>
+      <div id="globalClock" aria-live="off" style="position:static;display:flex;flex-direction:column;align-items:center;margin:20px auto;width:max-content;max-width:100%;">
+   <span class="clock-label">DURACIÓN TOTAL DE LA PARTIDA</span>
+   <span class="clock-value" id="clockValue">00:00:00</span>
+</div>
 
       ${btn('VOLVER','home-finished')}
     </section>
