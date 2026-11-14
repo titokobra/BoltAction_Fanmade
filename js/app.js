@@ -274,8 +274,10 @@ const zone = zones[state.zoneImage] || zones.bordelargo;
   view.innerHTML = `
     <section class="panel">
       <h2>${zone.title}</h2>
-      <img src="${zone.image}" alt="${zone.title}" class="deployment-zone-image">
-      <p class="deployment-zone-description">${zone.description}</p>
+         <div class="deployment-zone-container">
+           <img src="${zone.image}" alt="${zone.title}" class="deployment-zone-image">
+         </div>
+    <p class="deployment-zone-description">${zone.description}</p>
     </section>
     ${backButton()}
   `;
