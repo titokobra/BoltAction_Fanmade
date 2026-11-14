@@ -250,6 +250,7 @@ function zoneDetail(){
       image: 'images/cuadrantes.png',
       description: '<strong>4-6: CUADRANTES</strong><br>Divide la mesa en cuadrantes, según el mapa de abajo. Ambos jugadores tiran un dado. El jugador con mayor puntuación elige un cuadrante como zona de despliegue propia; el adversario, el contrario.'
     }
+  }
   };
 
   const zone = zones[state.zoneImage];
