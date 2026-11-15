@@ -180,7 +180,7 @@ function render(){
 function home(){
  view.innerHTML=`<section class="panel home-panel"><div class="menu-grid">
  <button class="menu-button" data-action="start">COMENZAR PARTIDA</button>
- <button class="menu-button" data-action="reset">REINICIAR PARTIDA</button>
+ <button class="menu-button reset-home-button" data-action="reset">REINICIAR PARTIDA</button>
  <button class="menu-button" data-action="scenario-groups">ELECCIÓN DE ESCENARIOS</button>
  <button class="menu-button" data-action="zones-menu">ZONAS DE DESPLIEGUE</button>
  <button class="menu-button" data-action="deployment-menu">TIPO DE DESPLIEGUE</button>
