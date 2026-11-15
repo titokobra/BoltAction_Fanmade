@@ -238,22 +238,27 @@ function deploymentMenu(){
  <button class="menu-button" data-deployment="6"><strong>6: NIEBLA DE GUERRA</strong></button>
  </div></section>${backButton()}`;
 }
+
 // ZONAS DE DESPLIEGUE
 function zonesMenu(){
  view.innerHTML=`
  <section class="panel">
    <h2>ZONAS DE DESPLIEGUE</h2>
+
+   <h3 class="deployment-roll-title">TIRAR UN DADO D6ddddd</h3>
+
    <div class="deployment-options">
      <button class="menu-button" data-zone="bordelargo">
-       BORDE LARGO
+       1-3: BORDES LARGOS
      </button>
      <button class="menu-button" data-zone="cuadrantes">
-       CUADRANTES
+       4-6: CUADRANTES
      </button>
    </div>
  </section>
  ${backButton()}`;
 }
+
 // FOTOGRAFÍAS DE ZONAS DE DESPLIEGUE
 
 function zoneDetail(){
