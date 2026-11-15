@@ -939,3 +939,14 @@ body[data-screen="finish-choice"] .flow-intro{color:var(--cream)}
     font-weight: bold;
     margin: 15px 0;
 }
+
+/* BOTÓN REINICIAR PARTIDA DEL MENÚ PRINCIPAL */
+.home-panel .reset-home-button {
+    background: linear-gradient(145deg, #a85a49, #743b31);
+    border-color: #c98b79;
+    color: #fff8e8;
+}
+
+.home-panel .reset-home-button:hover {
+    background: linear-gradient(145deg, #bd6955, #914b3b);
+}
