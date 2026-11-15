@@ -280,9 +280,6 @@ function zoneDetail(){
   view.innerHTML = `
     <section class="panel">
       <h2>${zone.title}</h2>
-
-      <h3 class="deployment-roll-title">TIRAR UN DADO D6</h3>
-
       <div class="deployment-zone-container">
         <img src="${zone.image}" alt="${zone.title}" class="deployment-zone-image">
       </div>
