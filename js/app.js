@@ -255,6 +255,7 @@ function zonesMenu(){
  ${backButton()}`;
 }
 // FOTOGRAFÍAS DE ZONAS DE DESPLIEGUE
+
 function zoneDetail(){
   const zones = {
     bordelargo: {
@@ -269,19 +270,24 @@ function zoneDetail(){
     }
   };
 
-const zone = zones[state.zoneImage] || zones.bordelargo;
-   
+  const zone = zones[state.zoneImage] || zones.bordelargo;
+
   view.innerHTML = `
     <section class="panel">
       <h2>${zone.title}</h2>
-         <div class="deployment-zone-container">
-           <img src="${zone.image}" alt="${zone.title}" class="deployment-zone-image">
-         </div>
-    <p class="deployment-zone-description">${zone.description}</p>
+
+      <h3 class="deployment-roll-title">TIRAR UN DADO D6</h3>
+
+      <div class="deployment-zone-container">
+        <img src="${zone.image}" alt="${zone.title}" class="deployment-zone-image">
+      </div>
+
+      <p class="deployment-zone-description">${zone.description}</p>
     </section>
     ${backButton()}
   `;
 }
+
 
 // DETALLE DEL DESPLIEGUE: los textos están en datos.js > deploymentRules.
 function deploymentDetail(){
