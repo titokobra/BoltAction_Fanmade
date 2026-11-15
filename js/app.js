@@ -245,7 +245,7 @@ function zonesMenu(){
  <section class="panel">
    <h2>ZONAS DE DESPLIEGUE</h2>
 
-   <h3 class="deployment-roll-title">TIRAR UN DADO D6ddddd</h3>
+   <p class="deployment-roll-prompt">TIRAR UN DADO D6</p><div class="deployment-options">
 
    <div class="deployment-options">
      <button class="menu-button" data-zone="bordelargo">
