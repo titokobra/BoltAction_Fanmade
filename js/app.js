@@ -457,17 +457,17 @@ function generating(){view.innerHTML=`<section class="panel" style="text-align:c
 // TÍTULO DE RONDA: muestra 'RONDA N' y el botón COMENZAR RONDA.
 function roundTitle(){view.innerHTML=`<section class="panel"><div class="turn-title">RONDA ${state.round}</div><div style="text-align:center">${btn('COMENZAR RONDA','start-round')}</div></section>${backButton()}`}
 // Pantalla entre la primera oleada y la ronda 1.
-function infiltratorTitle(){view.innerHTML=`<section class="panel flow-panel"><div class="turn-title">COLOCACIÓN DE INFILTRADORES</div><p class="flow-intro">La primera oleada ha terminado. Coloca ahora los infiltradores antes de comenzar la partida.</p><div class="choice-row">${btn('SIGUIENTE','start-round-1')}</div></section>${backButton()}`}
+function infiltratorTitle(){view.innerHTML=`<section class="panel flow-panel"><div class="turn-title infiltrator-title">COLOCACIÓN DE INFILTRADORES</div><p class="flow-intro">La primera oleada ha terminado. Coloca ahora los infiltradores antes de comenzar la partida.</p><div class="choice-row infiltrator-actions">${btn('SIGUIENTE','start-round-1')}</div></section>${backButton()}`}
 // EXTRACCIÓN DE DADOS: contadores de cada jugador, cuadro grande con el jugador que
 // actúa, botón SIGUIENTE DADO / FIN DE RONDA y ventana de ELIMINAR DADO.
 // El color de fondo del cuadro cambia según quién toque (variables --green y --red).
 function draw(){
  // Estos contadores reflejan los dados que quedan realmente dentro de la bolsa de esta ronda.
  const n1=state.bag.filter(x=>x==='p1').length,n2=state.bag.filter(x=>x==='p2').length;
-view.innerHTML=`<section class="panel">${state.deploymentPhase==='first-wave'?'<div class="turn-title">COMENZANDO PRIMERA OLEADA</div>':''}<div class="dice-counters"><div class="counter">${esc(state.p1)}<strong>${n1}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score1}</strong></div></div>
+view.innerHTML=`<section class="panel">${state.deploymentPhase==='first-wave'?'<div class="turn-title first-wave-title">PRIMERA OLEADA</div>':''}<div class="dice-counters"><div class="counter">${esc(state.p1)}<strong>${n1}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score1}</strong></div></div>
 <div class="counter player-2-counter">${esc(state.p2)}<strong>${n2}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score2}</strong></div></div></div>
  <div class="draw-area" id="drawArea" style="background:${state.last==='p1'?'var(--green)':state.last==='p2'?'var(--red)':'#272a22'}"><div class="player-name">${state.last?esc(state.last==='p1'?state.p1:state.p2):'¿QUIÉN ACTÚA?'}</div><div class="curtain ${state.reveal?'lift':''}" id="curtain"></div></div>
- <div class="extracted-summary" aria-live="polite">${state.resumeNotice&&state.last?`<div class="resume-notice ${state.last==='p1'?'player-1':'player-2'}"><span>LE TOCABA A</span><strong>${state.last==='p1'?'JUGADOR 1':'JUGADOR 2'}</strong></div>`:''}${state.drawn.length===0?'<strong>Todavía no se ha extraído ningún dado</strong>':`<strong class="extracted-count">Dados extraídos: ${state.drawn.length}</strong><span class="extracted-note">Al agotarse la bolsa, termina la ronda.</span>`}</div>
+ <div class="extracted-summary" aria-live="polite">${state.resumeNotice&&state.last?`<div class="resume-notice ${state.last==='p1'?'player-1':'player-2'}"><span>LE TOCABA A</span><strong>${state.last==='p1'?'JUGADOR 1':'JUGADOR 2'}</strong></div>`:''}${state.drawn.length===0?'<strong>Todavía no se ha extraído ningún dado</strong>':`<strong class="extracted-count">Dados extraídos: ${state.drawn.length}</strong><span class="extracted-note">${state.deploymentPhase==='first-wave'?'Al agotarse la bolsa, termina la oleada.':'Al agotarse la bolsa, termina la ronda.'}</span>`}</div>
  <div class="draw-actions">${state.bag.length?btn('SIGUIENTE DADO','next-die'):btn('FIN DE RONDA','end-round')}</div>
  <div class="dice-remove-action">${state.bag.length?btn('ELIMINAR DADO','open-remove-die'):''}</div>
 </section>
