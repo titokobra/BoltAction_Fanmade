@@ -950,3 +950,113 @@ body[data-screen="finish-choice"] .flow-intro{color:var(--cream)}
 .home-panel .reset-home-button:hover {
     background: linear-gradient(145deg, #bd6955, #914b3b);
 }
+
+/* ==========================================================================
+   DESPLIEGUE INICIAL (prepartida: reserva, infiltradores y transportes)
+   ==========================================================================
+   .pre-grid     : los dos recuadros de jugador (uno debajo de otro en móvil, lado a lado en PC)
+   .pre-box      : recuadro oscuro de un jugador
+   .pre-row      : una fila (etiqueta a la izquierda, contador − 0 + a la derecha)
+   .pre-btn      : botones − y + (se atenúan cuando no se puede subir o bajar más)
+   .pre-wave     : "Primera oleada: N" (calculada sola)
+   .pre-warn     : aviso si falta reserva obligatoria (Niebla de guerra)
+   .pre-note     : avisos de la misión; .pre-continue : botón CONTINUAR (desactivado si falta algo)
+   ========================================================================== */
+.pre-grid{display:grid;grid-template-columns:1fr;gap:16px;margin:0 0 16px}
+.pre-box{
+  background:var(--grain),linear-gradient(180deg,var(--o-700),var(--o-900));
+  border:1px solid var(--edge);
+  border-radius:8px;
+  padding:16px;
+  color:var(--cream);
+  box-shadow:inset 0 0 18px rgba(0,0,0,.35),0 4px 10px rgba(0,0,0,.3);
+}
+.panel .pre-box .pre-title{
+  margin:0 0 6px;
+  font-size:1.15rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--sand-top);
+  text-shadow:0 2px 2px #000;
+}
+.pre-total{margin:0 0 10px;color:#e9dfc2}
+.pre-total strong{color:#fff;font-size:1.2rem}
+.pre-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 0;
+  border-top:1px solid rgba(226,205,158,.22);
+}
+.pre-label{font-weight:600;line-height:1.25}
+.pre-label small{display:block;font-weight:500;color:var(--sand-top)}
+.pre-counter{
+  display:flex;
+  align-items:stretch;
+  flex:0 0 auto;
+  border:1px solid var(--edge-dark);
+  border-radius:7px;
+  overflow:hidden;
+  box-shadow:0 3px 0 var(--edge-dark);
+}
+.pre-counter strong{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:48px;
+  font-family:var(--font-title);
+  font-size:1.5rem;
+  font-weight:600;
+  color:var(--ink);
+  background:linear-gradient(180deg,#f6eed6,#e9dcb8);
+}
+.pre-btn{
+  width:48px;
+  height:46px;
+  min-height:46px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  font-size:1.7rem;
+  box-shadow:none;
+}
+.pre-btn:active{transform:none;background:#a98e5a}
+.pre-btn:disabled,.pre-continue:disabled{opacity:.38;cursor:not-allowed;filter:grayscale(.6);transform:none}
+.pre-wave{
+  margin-top:10px;
+  padding:10px;
+  text-align:center;
+  font-family:var(--font-title);
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  background:rgba(0,0,0,.38);
+  border:1px solid var(--edge);
+  border-radius:6px;
+}
+.pre-wave strong{margin-left:8px;font-size:1.7rem;color:#fff}
+.pre-warn{margin:10px 0 0;text-align:center;font-weight:600;font-size:.95rem;color:#ffd7a8}
+.pre-note{
+  margin:0 0 14px;
+  padding:10px 14px;
+  font-size:.95rem;
+  line-height:1.45;
+  color:var(--ink);
+  background:rgba(122,47,51,.10);
+  border-left:3px solid var(--red-army);
+  border-radius:0 5px 5px 0;
+}
+.pre-note-end{
+  margin:0 0 6px;
+  background:rgba(0,0,0,.06);
+  border-left-color:var(--edge);
+  text-align:center;
+  font-style:italic;
+  font-size:.9rem;
+}
+.pre-continue{width:100%;min-height:62px;font-size:1.25rem}
+@media(min-width:900px){
+  .pre-grid{grid-template-columns:1fr 1fr}
+  .pre-label{font-size:1.05rem}
+  .pre-note{font-size:1.02rem}
+}
