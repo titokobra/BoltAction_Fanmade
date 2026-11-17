@@ -923,7 +923,7 @@ state[key]=clamp(state[key]+delta,1,50);
  else if(a==='auto-both'){state.matchSetup=rollBoth();state.screen='auto-result';render()}
  else if(a==='launch')launchMatch()
  else if(a==='pre-adj')preAdjust(b.dataset.p,b.dataset.k,+b.dataset.d)   // − / + de la prepartida
- else if(a==='pre-continue'){if(preValid())startFirstWave()}       // CONTINUAR → Primera oleada
+ else if(a==='pre-continue'){if(preValid()){if(noReserveMission(state.matchSetup||{}))startRound1();else startFirstWave()}} // Ruptura no tiene fase de primera oleada
  else if(a==='start-round-1')startRound1()                              // SIGUIENTE → Ronda 1
  // --- Flanqueo ---
  else if(a==='flanking-yes'){state.flankingEnabled=true;state.flankStep=1;state.screen='flanking-choose';render()}
