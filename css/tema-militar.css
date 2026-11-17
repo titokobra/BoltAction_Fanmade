@@ -1086,3 +1086,12 @@ body[data-screen="draw"] .first-wave-title{
   .draw-area{height:clamp(250px,43vh,360px)}
   body[data-screen="draw"] .first-wave-title{font-size:clamp(1.55rem,6vw,2.3rem)}
 }
+
+
+/* Cabecera de marca: visible exclusivamente en la pantalla de inicio. */
+body:not([data-screen="home"]) #app > header{
+  display:none !important;
+}
+body[data-screen="home"] #app > header{
+  display:block !important;
+}
