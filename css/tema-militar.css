@@ -1060,3 +1060,29 @@ body[data-screen="finish-choice"] .flow-intro{color:var(--cream)}
   .pre-label{font-size:1.05rem}
   .pre-note{font-size:1.02rem}
 }
+
+
+/* Ajustes de la fase PRIMERA OLEADA y colocación de infiltradores */
+body[data-screen="draw"] .first-wave-title{
+  white-space:nowrap;
+  font-size:clamp(1.65rem,6.2vw,4.2rem);
+  letter-spacing:.045em;
+  padding:22px 0;
+}
+.draw-area{
+  height:clamp(260px,46vh,420px);
+}
+.infiltrator-title{
+  color:#080a07!important;
+  text-shadow:none!important;
+}
+.infiltrator-actions{
+  justify-content:center;
+}
+.infiltrator-actions button{
+  min-width:min(260px,100%);
+}
+@media(max-width:480px){
+  .draw-area{height:clamp(250px,43vh,360px)}
+  body[data-screen="draw"] .first-wave-title{font-size:clamp(1.55rem,6vw,2.3rem)}
+}
