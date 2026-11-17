@@ -36,7 +36,7 @@ const view = $('#view');
 //   screen=pantalla actual · p1/p2=nombres · d1/d2=dados iniciales (por defecto 8)
 //   round=ronda actual · remaining1/2=dados que quedan · bag=bolsa de dados
 //   drawn=dados ya sacados · last=último jugador que actuó · winner=resultado final
-const initialState = () => ({screen:'home',p1:'',p2:'',d1:12,d2:12,round:1,remaining1:12,remaining2:12,bag:[],drawn:[],last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,scoreApplied:false});
+const initialState = () => ({screen:'home',p1:'',p2:'',d1:12,d2:12,round:1,remaining1:12,remaining2:12,bag:[],drawn:[],deploymentPhase:null,last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,scoreApplied:false});
 // Recupera la partida guardada en el navegador (localStorage) o crea una nueva.
 let state = JSON.parse(localStorage.getItem('ba_state') || 'null') || initialState();
 // ----- HISTORIAL DEL NAVEGADOR -------------------------------------------------
@@ -65,7 +65,8 @@ if (state.timerStoppedAt === undefined) state.timerStoppedAt = null;
 if (state.roundStart1 === undefined) state.roundStart1 = state.d1 || 8;
 if (state.roundStart2 === undefined) state.roundStart2 = state.d2 || 8;
 if (state.countLimitNotice === undefined) state.countLimitNotice = '';
-if (state.matchSetup === undefined) state.matchSetup = {};// misión/despliegue elegidos (nuevo)
+if (state.matchSetup === undefined) state.matchSetup = {};
+if (state.deploymentPhase === undefined) state.deploymentPhase = null;// misión/despliegue elegidos (nuevo)
 if (state.score1 === undefined) state.score1 = 0;
 if (state.score2 === undefined) state.score2 = 0;
 if(state.roundScore1===undefined)state.roundScore1=0;
@@ -165,6 +166,7 @@ function render(){
   if(state.screen==='deploy-pick') return deployPick();
   if(state.screen==='auto-result') return autoResult();
   if(state.screen==='predeploy') return predeploy();   // despliegue inicial (reserva, infiltradores, transportes)
+  if(state.screen==='infiltrator-title') return infiltratorTitle();
   if(state.screen==='generating') return generating();
   if(state.screen==='round-title') return roundTitle();
   if(state.screen==='draw') return draw();
@@ -454,13 +456,15 @@ function autoResult(){
 function generating(){view.innerHTML=`<section class="panel" style="text-align:center;padding:60px 20px"><h2>GENERANDO DADOS ALEATORIOS</h2><p class="muted">Preparando la bolsa de dados…</p></section>`;setTimeout(()=>{if(state.screen==='generating'){state.screen='round-title';render()}},900)}
 // TÍTULO DE RONDA: muestra 'RONDA N' y el botón COMENZAR RONDA.
 function roundTitle(){view.innerHTML=`<section class="panel"><div class="turn-title">RONDA ${state.round}</div><div style="text-align:center">${btn('COMENZAR RONDA','start-round')}</div></section>${backButton()}`}
+// Pantalla entre la primera oleada y la ronda 1.
+function infiltratorTitle(){view.innerHTML=`<section class="panel flow-panel"><div class="turn-title">COLOCACIÓN DE INFILTRADORES</div><p class="flow-intro">La primera oleada ha terminado. Coloca ahora los infiltradores antes de comenzar la partida.</p><div class="choice-row">${btn('SIGUIENTE','start-round-1')}</div></section>${backButton()}`}
 // EXTRACCIÓN DE DADOS: contadores de cada jugador, cuadro grande con el jugador que
 // actúa, botón SIGUIENTE DADO / FIN DE RONDA y ventana de ELIMINAR DADO.
 // El color de fondo del cuadro cambia según quién toque (variables --green y --red).
 function draw(){
  // Estos contadores reflejan los dados que quedan realmente dentro de la bolsa de esta ronda.
  const n1=state.bag.filter(x=>x==='p1').length,n2=state.bag.filter(x=>x==='p2').length;
-view.innerHTML=`<section class="panel"><div class="dice-counters"><div class="counter">${esc(state.p1)}<strong>${n1}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score1}</strong></div></div>
+view.innerHTML=`<section class="panel">${state.deploymentPhase==='first-wave'?'<div class="turn-title">COMENZANDO PRIMERA OLEADA</div>':''}<div class="dice-counters"><div class="counter">${esc(state.p1)}<strong>${n1}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score1}</strong></div></div>
 <div class="counter player-2-counter">${esc(state.p2)}<strong>${n2}</strong><small class="muted">dados en la bolsa</small><div class="counter-score">Puntuación: <strong>${state.score2}</strong></div></div></div>
  <div class="draw-area" id="drawArea" style="background:${state.last==='p1'?'var(--green)':state.last==='p2'?'var(--red)':'#272a22'}"><div class="player-name">${state.last?esc(state.last==='p1'?state.p1:state.p2):'¿QUIÉN ACTÚA?'}</div><div class="curtain ${state.reveal?'lift':''}" id="curtain"></div></div>
  <div class="extracted-summary" aria-live="polite">${state.resumeNotice&&state.last?`<div class="resume-notice ${state.last==='p1'?'player-1':'player-2'}"><span>LE TOCABA A</span><strong>${state.last==='p1'?'JUGADOR 1':'JUGADOR 2'}</strong></div>`:''}${state.drawn.length===0?'<strong>Todavía no se ha extraído ningún dado</strong>':`<strong class="extracted-count">Dados extraídos: ${state.drawn.length}</strong><span class="extracted-note">Al agotarse la bolsa, termina la ronda.</span>`}</div>
@@ -569,8 +573,8 @@ function startWarnModal(){
 //             26 27 → misión al azar de las 25 (ya traen su despliegue)  → auto-result
 //             AMBAS → una al azar entre las 31 (6 base + 25 del pack)    → auto-result
 //             MANUALMENTE → igual que NO (zone-pick → deploy-pick)
-//   auto-result → botón COMENZAR PARTIDA → predeploy (DESPLIEGUE INICIAL: reserva, infiltradores, transportes) → CONTINUAR → RONDA 1
-//   (la prepartida es solo informativa: en la ronda 1 la bolsa lleva TODOS los dados)
+//   auto-result → COMENZAR PARTIDA → predeploy → CONTINUAR → PRIMERA OLEADA → COLOCACIÓN DE INFILTRADORES → RONDA 1
+//   La primera oleada usa solo sus dados; la ronda 1 vuelve a cargar todos los dados originales.
 // El resultado se guarda en state.matchSetup = {src,n,zone,zoneRoll,deploy,deployRoll}
 //   src='base' (juego base) o 'pack' (26 27) · n=número de misión · zone/deploy=claves de abajo.
 
@@ -649,12 +653,26 @@ function launchMatch(){
     state.screen='predeploy';render();
   }else startRound1();
 }
-// startRound1(): termina la prepartida y arranca la partida de verdad: reloj en marcha y RONDA 1.
-// IMPORTANTE: en la ronda 1 entran TODOS los dados en la bolsa (los datos de la prepartida no los restan).
+// startFirstWave(): prepara una bolsa exclusiva con los dados calculados como primera oleada.
+// No incluye reservas, infiltradores ni dados en transportes. Tampoco consume los dados originales.
+function startFirstWave(){
+  state.deploymentPhase='first-wave';
+  state.bag=[];
+  for(let i=0;i<preWave('p1');i++)state.bag.push('p1');
+  for(let i=0;i<preWave('p2');i++)state.bag.push('p2');
+  state.bag.sort(()=>Math.random()-.5);
+  state.drawn=[];state.last=null;state.reveal=false;state.removeDieOpen=false;state.resumeNotice=false;
+  state.screen='draw';save();render();
+}
+// startRound1(): tras colocar infiltradores, comienza la ronda 1 con TODOS los dados originales.
 function startRound1(){
   state.timerStartedAt=Date.now();state.timerStoppedAt=null;
-  state.launched=true;   // a partir de aquí cuenta como 'partida en curso'
-  state.screen='generating';render();
+  state.launched=true;
+  state.deploymentPhase=null;
+  state.remaining1=state.d1;state.remaining2=state.d2;
+  state.roundStart1=state.d1;state.roundStart2=state.d2;
+  state.round=1;
+  state.screen='generating';save();render();
 }
 
 // ----- PANTALLA DE DESPLIEGUE INICIAL (PREPARTIDA) -------------------------------------
@@ -737,7 +755,7 @@ state.winner=null;
 state.score1=0;
 state.score2=0;
 state.scoreApplied=false;
-state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.preGame=null;state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
+state.active=true;state.deploymentPhase=null;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.preGame=null;state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
 function clamp(v,a,b){return Math.max(a,Math.min(b,Number.isFinite(v)?v:a))}
@@ -751,7 +769,7 @@ function nextDie(){
  save();
  setTimeout(()=>{
   if(state.screen!=='draw'||!state.bag.length)return;
-  const who=state.bag.shift();state.drawn.push(who);if(who==='p1')state.remaining1--;else state.remaining2--;
+  const who=state.bag.shift();state.drawn.push(who);if(state.deploymentPhase!=='first-wave'){if(who==='p1')state.remaining1--;else state.remaining2--;}
   state.last=who;save();render();
   const c=$('#curtain');if(c)requestAnimationFrame(()=>c.classList.add('lift'));
  },120);
@@ -759,6 +777,7 @@ function nextDie(){
 // endRound(): cuando la bolsa está vacía, pasa a 'RONDA FINALIZADA'.
 function endRound(){
  if(state.bag.length)return;
+ if(state.deploymentPhase==='first-wave'){state.screen='infiltrator-title';state.removeDieOpen=false;save();render();return;}
 
  // Preparar la puntuación de la nueva ronda.
  state.roundScore1=0;
@@ -904,7 +923,8 @@ state[key]=clamp(state[key]+delta,1,50);
  else if(a==='auto-both'){state.matchSetup=rollBoth();state.screen='auto-result';render()}
  else if(a==='launch')launchMatch()
  else if(a==='pre-adj')preAdjust(b.dataset.p,b.dataset.k,+b.dataset.d)   // − / + de la prepartida
- else if(a==='pre-continue'){if(preValid())startRound1()}                  // CONTINUAR → Ronda 1
+ else if(a==='pre-continue'){if(preValid())startFirstWave()}       // CONTINUAR → Primera oleada
+ else if(a==='start-round-1')startRound1()                              // SIGUIENTE → Ronda 1
  // --- Flanqueo ---
  else if(a==='flanking-yes'){state.flankingEnabled=true;state.flankStep=1;state.screen='flanking-choose';render()}
  else if(a==='flanking-no'){state.flankingEnabled=false;state.screen='generating';render()}
