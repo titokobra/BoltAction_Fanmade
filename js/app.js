@@ -164,6 +164,7 @@ function render(){
   if(state.screen==='zone-pick') return zonePick();
   if(state.screen==='deploy-pick') return deployPick();
   if(state.screen==='auto-result') return autoResult();
+  if(state.screen==='predeploy') return predeploy();   // despliegue inicial (reserva, infiltradores, transportes)
   if(state.screen==='generating') return generating();
   if(state.screen==='round-title') return roundTitle();
   if(state.screen==='draw') return draw();
@@ -436,7 +437,7 @@ function autoResult(){
   const dado=r=>r?`<small>Dado: ${r}</small>`:'';
   // Recuadros de zona y tipo: en juego base (sorteados) y en manual (elegidos).
   // En misiones del pack no salen, porque ya traen su despliegue en el texto.
-  const chips=(m.src==='base'||manual)?`<div class="result-chips">
+  const chips=(m.zone&&m.deploy)?`<div class="result-chips">
     <div class="result-chip"><span>ZONA DE DESPLIEGUE</span><strong>${ZONE_LABELS[m.zone]}</strong>${dado(m.zoneRoll)}</div>
     <div class="result-chip"><span>TIPO DE DESPLIEGUE</span><strong>${DEPLOY_LABELS[m.deploy]}</strong>${dado(m.deployRoll)}</div>
   </div>`:'';
@@ -568,7 +569,8 @@ function startWarnModal(){
 //             26 27 → misión al azar de las 25 (ya traen su despliegue)  → auto-result
 //             AMBAS → una al azar entre las 31 (6 base + 25 del pack)    → auto-result
 //             MANUALMENTE → igual que NO (zone-pick → deploy-pick)
-//   auto-result → botón COMENZAR PARTIDA → RONDA 1
+//   auto-result → botón COMENZAR PARTIDA → predeploy (DESPLIEGUE INICIAL: reserva, infiltradores, transportes) → CONTINUAR → RONDA 1
+//   (la prepartida es solo informativa: en la ronda 1 la bolsa lleva TODOS los dados)
 // El resultado se guarda en state.matchSetup = {src,n,zone,zoneRoll,deploy,deployRoll}
 //   src='base' (juego base) o 'pack' (26 27) · n=número de misión · zone/deploy=claves de abajo.
 
@@ -581,13 +583,35 @@ const ZONE_LABELS = {'1-3':'1-3: BORDE LARGO','4-6':'4-6: CUADRANTES'};
 // Textos de los tipos de despliegue. Deben coincidir con las claves de deploymentRules (datos.js).
 const DEPLOY_LABELS = {'1-3':'1-3: ENCUENTRO COMPROMETIDO','4-5':'4-5: POSICIONES PREPARADAS','6':'6: NIEBLA DE GUERRA'};
 
+// ----- DESPLIEGUE INICIAL (PREPARTIDA): QUÉ REGLA SE APLICA A CADA MISIÓN ------------
+// PACK_DESPLIEGUE: cómo se conoce el tipo de despliegue de cada misión del pack 26 27.
+//   - Misiones 1 a 6 (no aparecen aquí): son copias de las del juego base y dicen "tirar en tabla",
+//     así que se sortean zona y tipo de despliegue.
+//   - special:true  → misiones 7, 8 y 12: el atacante y el defensor despliegan de forma distinta.
+//                     Los contadores quedan libres y sale un aviso para revisar el texto.
+//   - type:'1-3'    → Encuentro comprometido · type:'4-5' → Posiciones preparadas (ya escrito en la misión)
+//   - note:true     → además sale un aviso de que la misión tiene reglas propias de despliegue.
+const PACK_DESPLIEGUE = {
+  '7':{special:true},'8':{special:true},'12':{special:true},
+  '9':{type:'4-5'},'10':{type:'4-5'},'11':{type:'4-5'},'13':{type:'1-3',note:true},'14':{type:'4-5'},
+  '15':{type:'4-5'},'16':{type:'4-5'},'17':{type:'1-3'},'18':{type:'1-3'},'19':{type:'4-5'},'20':{type:'4-5'},
+  '21':{type:'1-3'},'22':{type:'1-3'},'23':{type:'1-3'},'24':{type:'4-5'},'25':{type:'4-5'}
+};
+// noReserveMission(m): RUPTURA (misión 3 del juego base y del pack): NO se permiten reservas.
+// Por eso, si al sortear sale Niebla de guerra (que obliga a tener reservas) se repite la tirada.
+function noReserveMission(m){return m.n!=null&&String(m.n)==='3'&&(m.src==='base'||m.src==='pack')}
+// noInfiltMission(m): ROMPIENDO LA LÍNEA (misión 18 del pack): no hay infiltrados en la mesa al empezar.
+function noInfiltMission(m){return m.src==='pack'&&String(m.n)==='18'}
+
 // d6(): simula un dado de 6 caras (1-6).
 function d6(){return 1+Math.floor(Math.random()*6)}
 // rollDeployment(m): tira un D6 para la zona (1-3 borde largo, 4-6 cuadrantes) y otro D6 para el
 // tipo (1-3 encuentro comprometido, 4-5 posiciones preparadas, 6 niebla de guerra).
 function rollDeployment(m){
   m.zoneRoll=d6();m.zone=m.zoneRoll<=3?'1-3':'4-6';
-  m.deployRoll=d6();m.deploy=m.deployRoll<=3?'1-3':(m.deployRoll<=5?'4-5':'6');
+  const tipo=r=>r<=3?'1-3':(r<=5?'4-5':'6');
+  // En Ruptura no se admiten reservas: si sale Niebla de guerra (6) se repite la tirada del tipo
+  do{m.deployRoll=d6();m.deploy=tipo(m.deployRoll)}while(m.deploy==='6'&&noReserveMission(m));
   return m;
 }
 // rollBase(n): misión del juego base (al azar, o la número n si se indica) + zona y tipo al azar.
@@ -600,7 +624,12 @@ function rollBase(n){
 function rollPack(i){
   const list=scenarioGroups[PACK_GROUP];
   const sc=list[i==null?Math.floor(Math.random()*list.length):i];
-  return {src:'pack',n:sc[0]};
+  const m={src:'pack',n:sc[0]};
+  const cfg=PACK_DESPLIEGUE[String(sc[0])];
+  if(!cfg)return rollDeployment(m);                 // misiones 1-6: "tirar en tabla" (zona y tipo al azar)
+  if(cfg.special){m.special=true;m.note=true}       // misiones 7, 8, 12: reglas propias atacante/defensor
+  else{m.deploy=cfg.type;if(cfg.note)m.note=true}   // el resto: tipo fijo escrito en la misión
+  return m;
 }
 // rollBoth(): todas las misiones en un mismo saco (6 base + 25 del pack), cada una con la misma
 // probabilidad. Si sale una del juego base, se le tiran también zona y tipo de despliegue.
@@ -611,10 +640,91 @@ function rollBoth(){
 }
 // launchMatch(): se pulsa COMENZAR PARTIDA (o se termina la elección manual). Arranca el reloj
 // de la partida y pasa a 'GENERANDO DADOS' → RONDA 1.
+// launchMatch(): se pulsa COMENZAR PARTIDA. Si se conoce el tipo de despliegue (o la misión tiene
+// reglas propias) se abre primero la pantalla de DESPLIEGUE INICIAL; si no, se empieza directamente.
 function launchMatch(){
+  const m=state.matchSetup||{};
+  if(m.deploy||m.special){
+    state.preGame={p1:{res:0,inf:0,trn:0},p2:{res:0,inf:0,trn:0}};   // todos los contadores empiezan en 0
+    state.screen='predeploy';render();
+  }else startRound1();
+}
+// startRound1(): termina la prepartida y arranca la partida de verdad: reloj en marcha y RONDA 1.
+// IMPORTANTE: en la ronda 1 entran TODOS los dados en la bolsa (los datos de la prepartida no los restan).
+function startRound1(){
   state.timerStartedAt=Date.now();state.timerStoppedAt=null;
   state.launched=true;   // a partir de aquí cuenta como 'partida en curso'
   state.screen='generating';render();
+}
+
+// ----- PANTALLA DE DESPLIEGUE INICIAL (PREPARTIDA) -------------------------------------
+// Un recuadro por jugador con: dados totales, En Reserva, Infiltradores, En Transportes y, calculada
+// sola, la Primera oleada (= total − reserva − infiltradores − transportes). Contadores desde 0.
+//   · Encuentro comprometido (1-3) y Posiciones preparadas (4-5): reserva máx. = mitad redondeada hacia ABAJO.
+//   · Niebla de guerra (6): reserva obligatoria, mín. = mitad redondeada hacia ARRIBA.
+//   · Ruptura: sin reservas · Rompiendo la línea: sin infiltradores · misiones 7, 8, 12: contadores libres.
+// preRules(m,total): límites [mín,máx] de cada contador según el tipo de despliegue y la misión.
+function preRules(m,total){
+  let res,inf=[0,total],trn=[0,total];
+  if(m.special)res=[0,total];
+  else if(m.deploy==='6')res=[Math.ceil(total/2),total];
+  else res=[0,Math.floor(total/2)];
+  if(noReserveMission(m))res=[0,0];
+  if(noInfiltMission(m))inf=[0,0];
+  return {res,inf,trn};
+}
+// preTotal(p): dados con los que empieza la partida cada jugador.
+function preTotal(p){return p==='p1'?state.remaining1:state.remaining2}
+// preWave(p): primera oleada de un jugador.
+function preWave(p){const o=state.preGame[p];return preTotal(p)-o.res-o.inf-o.trn}
+// preValid(): ¿se cumplen las reglas obligatorias? (en Niebla de guerra, la reserva mínima)
+function preValid(){
+  const m=state.matchSetup||{};
+  return ['p1','p2'].every(p=>state.preGame[p].res>=preRules(m,preTotal(p)).res[0]&&preWave(p)>=0);
+}
+// preAdjust(p,k,d): suma (+1) o resta (−1) en el contador k ('res','inf','trn') del jugador p.
+function preAdjust(p,k,d){
+  const m=state.matchSetup||{},o=state.preGame[p],t=preTotal(p),cap=preRules(m,t)[k];
+  const v=o[k]+d;
+  if(v<0||v>cap[1]||preWave(p)-d<0)return;          // no baja de 0, no pasa del máximo, la oleada no es negativa
+  o[k]=v;save();
+  const y=window.scrollY;render();window.scrollTo(0,y);
+}
+function predeploy(){
+  const m=state.matchSetup||{};
+  if(!state.preGame)state.preGame={p1:{res:0,inf:0,trn:0},p2:{res:0,inf:0,trn:0}};
+  const t6=m.deploy==='6';
+  const tipo=m.special?'Reglas propias de la misión':DEPLOY_LABELS[m.deploy];
+  const regla=m.special?'':(t6?'Al menos la mitad de las unidades, redondeando hacia arriba, debe quedar en reserva.'
+                            :'Hasta la mitad de las unidades, redondeando hacia abajo, puede quedar en reserva.');
+  const extra=[];
+  if(m.note)extra.push('Esta misión tiene reglas propias de despliegue (atacante y defensor): revisa el texto de la misión.');
+  if(noReserveMission(m))extra.push('En esta misión no se permiten unidades en reserva.');
+  if(noInfiltMission(m))extra.push('En esta misión no hay infiltrados sobre la mesa al empezar.');
+  const fila=(p,k,label,tag,disabled)=>{
+    const o=state.preGame[p],t=preTotal(p),cap=preRules(m,t)[k],sum=o.res+o.inf+o.trn;
+    const menos=o[k]<=0,mas=o[k]>=cap[1]||sum>=t;
+    return `<div class="pre-row"><span class="pre-label">${label}${tag?`<small>${tag}</small>`:''}</span>
+      <div class="pre-counter"><button class="pre-btn" data-action="pre-adj" data-p="${p}" data-k="${k}" data-d="-1" aria-label="Quitar ${label}" ${menos?'disabled':''}>−</button><strong>${o[k]}</strong><button class="pre-btn" data-action="pre-adj" data-p="${p}" data-k="${k}" data-d="1" aria-label="Añadir ${label}" ${mas?'disabled':''}>+</button></div></div>`;
+  };
+  const caja=(p,num)=>{
+    const t=preTotal(p),r=preRules(m,t),escrito=((num===1?state.p1:state.p2)||'').trim();
+    // Si el jugador no escribió su nombre (o es el de por defecto) solo se pone "Jugador N"
+    const titulo=escrito&&escrito.toLowerCase()!==('jugador '+num)?`Jugador ${num} · ${esc(escrito)}`:`Jugador ${num}`;
+    const tagRes=m.special?'':(noReserveMission(m)?'(no permitida)':(t6?`(Mín ${r.res[0]})`:`(Máx ${r.res[1]})`));
+    const tagInf=noInfiltMission(m)?'(no permitidos)':'';
+    const falta=state.preGame[p].res<r.res[0]?`<p class="pre-warn">Faltan ${r.res[0]-state.preGame[p].res} dado(s) en reserva (mínimo ${r.res[0]}).</p>`:'';
+    return `<div class="pre-box"><h3 class="pre-title">${titulo}</h3>
+      <p class="pre-total">Cantidad de dados total: <strong>${t}</strong></p>
+      ${fila(p,'res','En Reserva',tagRes)}${fila(p,'inf','Infiltradores',tagInf)}${fila(p,'trn','En Transportes','')}
+      <div class="pre-wave">Primera oleada: <strong>${preWave(p)}</strong></div>${falta}</div>`;
+  };
+  view.innerHTML=`<section class="panel"><h2>Despliegue inicial</h2>
+  <p class="flow-intro"><strong>${tipo}</strong>${regla?'<br>'+regla:''}</p>
+  ${extra.map(x=>`<p class="pre-note">${x}</p>`).join('')}
+  <div class="pre-grid">${caja('p1',1)}${caja('p2',2)}</div>
+  <p class="pre-note pre-note-end">Estos datos son solo de la prepartida: en la Ronda 1 la bolsa lleva todos los dados.</p>
+  <div class="choice-row"><button class="pre-continue" data-action="pre-continue" ${preValid()?'':'disabled'}>CONTINUAR</button></div></section>${backButton()}`;
 }
 
 function newBag(){state.roundStart1=state.remaining1;state.roundStart2=state.remaining2;state.countLimitNotice='';state.bag=[];for(let i=0;i<state.remaining1;i++)state.bag.push('p1');for(let i=0;i<state.remaining2;i++)state.bag.push('p2');state.bag.sort(()=>Math.random()-.5);state.drawn=[];state.last=null;state.reveal=false;state.removeDieOpen=false}
@@ -627,7 +737,7 @@ state.winner=null;
 state.score1=0;
 state.score2=0;
 state.scoreApplied=false;
-state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
+state.active=true;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.preGame=null;state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
 function clamp(v,a,b){return Math.max(a,Math.min(b,Number.isFinite(v)?v:a))}
@@ -762,7 +872,7 @@ view.addEventListener('click',e=>{
  else if(a==='factions'){state.screen='factions';render()}
  else if(a==='rules-pdf'){state.screen='rules-pdf';render()}   // abre REFERENCIA REGLAS
  else if(a==='resume'){state.screen=state.screenBeforePause||(state.bag&&state.bag.length?'draw':'round-title');state.resumeNotice=true;render()}
- else if(a==='go-home'){if(['draw','round-title','round-finished','count','finish-choice','winner','auto-ask','auto-mode','zone-pick','deploy-pick','auto-result'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
+ else if(a==='go-home'){if(['draw','round-title','round-finished','count','finish-choice','winner','auto-ask','auto-mode','zone-pick','deploy-pick','auto-result','predeploy'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
  // Botón REINICIAR PARTIDA y navegación Volver / Inicio / Continuar
  else if(a==='reset')resetMatch()
   else if(a==='back'){
@@ -793,6 +903,8 @@ state[key]=clamp(state[key]+delta,1,50);
  else if(a==='auto-pack'){state.matchSetup=rollPack();state.screen='auto-result';render()}
  else if(a==='auto-both'){state.matchSetup=rollBoth();state.screen='auto-result';render()}
  else if(a==='launch')launchMatch()
+ else if(a==='pre-adj')preAdjust(b.dataset.p,b.dataset.k,+b.dataset.d)   // − / + de la prepartida
+ else if(a==='pre-continue'){if(preValid())startRound1()}                  // CONTINUAR → Ronda 1
  // --- Flanqueo ---
  else if(a==='flanking-yes'){state.flankingEnabled=true;state.flankStep=1;state.screen='flanking-choose';render()}
  else if(a==='flanking-no'){state.flankingEnabled=false;state.screen='generating';render()}
