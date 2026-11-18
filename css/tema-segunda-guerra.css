@@ -1,0 +1,603 @@
+/* ==========================================================================
+   BOLT ACTION FANMADE · tema "Segunda Guerra Mundial"
+   ==========================================================================
+   Se carga la ÚLTIMA (después de estilos.css y tema-militar.css) y solo
+   cambia el aspecto: colores, tipografías, bordes, botones y fondo.
+   No toca ningún texto ni la lógica de la web.
+
+   IDEA DE DISEÑO: "caja de munición + órdenes de campaña".
+     · Fondo: lona verde oliva con trama de tejido y viñeta.
+     · Paneles: papel manila de órdenes de campaña con remaches en las
+       esquinas y una barra de título de acero oliva con letra de plantilla
+       (stencil) desgastada.
+     · Botones: chapas planas con sombra dura, como placas de metal.
+     · Rojo sello (#a52f25) solo para acciones peligrosas y detalles.
+
+   CÓMO AJUSTAR:
+     · Colores: todo está en ":root" justo debajo.
+     · Tipografías: --font-stencil (títulos), --font-ui (botones y etiquetas),
+       --font-type (máquina de escribir) y --font-body (textos largos).
+       Si cambias alguna, cambia también el enlace de Google Fonts en
+       index.html. Sin internet se usan fuentes del sistema.
+     · Para volver al diseño anterior: quita el <link> a este archivo en
+       index.html.
+   ========================================================================== */
+
+:root{
+  /* Verdes oliva (lona militar) */
+  --o-950:#11140b;
+  --o-900:#1a1f10;
+  --o-800:#252b16;
+  --o-700:#333a1f;
+  --o-600:#4a5229;
+
+  /* Papel manila de campaña */
+  --parch-100:#dacfa6;
+  --parch-200:#c9ba8b;
+  --parch-300:#b4a373;
+
+  /* Chapa caqui de los botones */
+  --sand-top:#d7c78f;
+  --sand-bot:#b4a165;
+
+  /* Bordes */
+  --edge:#7d7141;
+  --edge-dark:#3a381d;
+
+  --ink:#16160e;
+  --cream:#ece6cf;
+  --red-army:#8e2a22;
+  --green-army:#3b5427;
+
+  /* Nuevos */
+  --stencil:#ebe5cb;
+  --stamp:#a52f25;
+  --steel:#171a0f;
+  --rivet-hi:#a59d6b;
+  --rivet-mid:#6c6640;
+  --rivet-lo:#14160d;
+
+  /* Tipografías */
+  --font-stencil:'Stardos Stencil','Allerta Stencil','Stencil Std',Impact,'Arial Narrow',sans-serif;
+  --font-title:'Barlow Condensed','Oswald','Arial Narrow',sans-serif;
+  --font-ui:'Barlow Condensed','Oswald','Arial Narrow',sans-serif;
+  --font-type:'Special Elite','Courier Prime','Courier New',monospace;
+  --font-body:'Barlow','Segoe UI',Arial,sans-serif;
+
+  /* Grano de papel / lona (ruido en SVG, sin imágenes externas) */
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .38 -.07'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* Desgaste de pintura: máscara con motitas para las letras de plantilla */
+  --wear:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -13 9.9'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23w)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Fondo: lona oliva con viñeta ---------- */
+body{
+  font-family:var(--font-body);
+  background:
+    var(--grain),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.13) 0 1px,transparent 1px 4px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px),
+    #2a3018;
+}
+body:before{
+  background:
+    radial-gradient(ellipse at 50% 30%,rgba(0,0,0,0) 35%,rgba(4,5,2,.62) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.35),transparent 18%,transparent 82%,rgba(0,0,0,.45));
+}
+
+/* Letra de plantilla desgastada (títulos grandes) */
+header h1,
+.turn-title,
+.round-finish-title,
+.draw-area .player-name,
+.winner-announcement{
+  -webkit-mask-image:var(--wear);
+  mask-image:var(--wear);
+  -webkit-mask-size:320px 320px;
+  mask-size:320px 320px;
+}
+
+/* ---------- Cabecera / título ---------- */
+header h1{
+  font-family:var(--font-stencil);
+  font-weight:700;
+  letter-spacing:.05em;
+  color:var(--stencil);
+  text-shadow:0 3px 0 rgba(0,0,0,.6);
+}
+header h1::first-line{color:var(--stencil)}
+header p{
+  font-family:var(--font-type);
+  font-weight:400;
+  color:var(--sand-top);
+  letter-spacing:.2em;
+  text-shadow:0 2px 3px #000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.9em;
+}
+/* Estrellas a los lados del lema (solo forma, sin texto) */
+header p::before,
+header p::after{
+  content:"";
+  flex:0 0 auto;
+  width:.95em;
+  height:.95em;
+  background:var(--stamp);
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+
+/* ---------- Paneles: papel de órdenes con remaches ---------- */
+.panel{
+  background:var(--grain),linear-gradient(170deg,var(--parch-100),var(--parch-200));
+  border:3px solid var(--steel);
+  border-radius:3px;
+  box-shadow:
+    0 0 0 1px rgba(215,199,143,.25),
+    0 18px 36px rgba(0,0,0,.65),
+    inset 0 0 38px rgba(80,66,20,.32);
+}
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 10px 10px,var(--rivet-hi) 0 1.8px,var(--rivet-mid) 2.4px 3.2px,var(--rivet-lo) 3.6px 4.4px,transparent 4.8px),
+    radial-gradient(circle at calc(100% - 10px) 10px,var(--rivet-hi) 0 1.8px,var(--rivet-mid) 2.4px 3.2px,var(--rivet-lo) 3.6px 4.4px,transparent 4.8px),
+    radial-gradient(circle at 10px calc(100% - 10px),var(--rivet-hi) 0 1.8px,var(--rivet-mid) 2.4px 3.2px,var(--rivet-lo) 3.6px 4.4px,transparent 4.8px),
+    radial-gradient(circle at calc(100% - 10px) calc(100% - 10px),var(--rivet-hi) 0 1.8px,var(--rivet-mid) 2.4px 3.2px,var(--rivet-lo) 3.6px 4.4px,transparent 4.8px);
+}
+
+/* Barra de título: acero oliva con letra de plantilla y ribete de latón */
+.panel h2{
+  font-family:var(--font-stencil);
+  font-weight:700;
+  letter-spacing:.07em;
+  color:var(--stencil);
+  background:var(--grain),linear-gradient(180deg,#2e3521,#161a0e);
+  border-bottom:3px solid #0b0d07;
+  box-shadow:0 3px 0 var(--edge);
+  text-shadow:none;
+  padding-left:30px;
+  padding-right:30px;
+}
+.panel h3{
+  font-family:var(--font-ui);
+  font-weight:700;
+  letter-spacing:.06em;
+  color:#3a3119;
+}
+.panel p{font-family:var(--font-body)}
+
+/* Pantallas oscuras: lona oliva con filete interior */
+body[data-screen="home"] .panel,
+body[data-screen="factions"] .panel,
+body[data-screen="faction-detail"] .panel,
+body[data-screen="round-title"] .panel,
+body[data-screen="draw"] .panel,
+body[data-screen="round-finished"] .panel,
+body[data-screen="count"] .panel,
+body[data-screen="finish-choice"] .panel,
+body[data-screen="generating"] .panel,
+body[data-screen="winner"] .panel{
+  background:var(--grain),linear-gradient(165deg,var(--o-700),var(--o-900));
+  border-color:#0d0f08;
+  box-shadow:
+    0 0 0 1px var(--edge),
+    0 18px 36px rgba(0,0,0,.7),
+    inset 0 0 0 5px var(--o-800),
+    inset 0 0 0 6px rgba(215,199,143,.28),
+    inset 0 0 60px rgba(0,0,0,.4);
+}
+body[data-screen="home"] .panel h3,
+body[data-screen="factions"] .panel h3,
+body[data-screen="faction-detail"] .panel h3{color:var(--sand-top)}
+
+/* ---------- Botones: chapas planas con sombra dura ---------- */
+button,.menu-button{
+  font-family:var(--font-ui);
+  font-weight:700;
+  font-size:1.18rem;
+  letter-spacing:.1em;
+  color:var(--ink);
+  background:var(--grain),linear-gradient(180deg,var(--sand-top),var(--sand-bot));
+  border:2px solid #12140b;
+  border-radius:3px;
+  box-shadow:0 4px 0 #12140b,0 9px 12px rgba(0,0,0,.4);
+  text-shadow:none;
+}
+button:hover{
+  background:var(--grain),linear-gradient(180deg,#e3d6a3,#bfac70);
+  transform:translateY(-1px);
+}
+button:active{
+  transform:translateY(3px);
+  box-shadow:0 1px 0 #12140b,0 3px 5px rgba(0,0,0,.45);
+}
+
+/* Botones de menú: chapa oliva con barra caqui a la izquierda */
+.menu-button{
+  color:var(--sand-top);
+  background:var(--grain),linear-gradient(180deg,#363e22,#232918);
+  border:2px solid #0d0f08;
+  border-left:8px solid var(--sand-bot);
+  box-shadow:0 4px 0 #0a0c06,0 9px 12px rgba(0,0,0,.4);
+  text-shadow:none;
+}
+.menu-button:hover{
+  background:var(--grain),linear-gradient(180deg,#444d2b,#2c3320);
+  color:#f5ecd0;
+  border-left-color:#d7c78f;
+}
+
+/* ---------- Pantalla de inicio ---------- */
+.home-panel .menu-button:first-child{
+  color:var(--ink);
+  background:var(--grain),linear-gradient(180deg,var(--sand-top),var(--sand-bot));
+  border:2px solid #12140b;
+  border-left:10px solid var(--stamp);
+  box-shadow:0 5px 0 #12140b,0 10px 16px rgba(0,0,0,.45);
+  text-shadow:none;
+}
+.home-panel .menu-button:first-child:hover{
+  background:var(--grain),linear-gradient(180deg,#e4d7a5,#c0ad71);
+}
+.home-panel .reset-home-button{
+  color:#f6e9d0;
+  background:var(--grain),linear-gradient(180deg,#8e2c24,#611c17);
+  border-color:#250907;
+  border-left:8px solid #d25a47;
+  box-shadow:0 4px 0 #250907,0 9px 12px rgba(0,0,0,.4);
+}
+.home-panel .reset-home-button:hover{
+  background:var(--grain),linear-gradient(180deg,#a2352b,#6f211b);
+  border-left-color:#e57a67;
+}
+
+/* ---------- Listas sobre papel (escenarios, reglas, despliegue) ---------- */
+.scenario-list button{
+  font-family:var(--font-body);
+  font-weight:600;
+  color:var(--ink);
+  background:var(--grain),linear-gradient(180deg,#eee5c3,#d8cba2);
+  border:2px solid #3a381d;
+  border-left:7px solid var(--o-600);
+  border-radius:3px;
+  box-shadow:0 3px 0 #3a381d,0 6px 8px rgba(0,0,0,.2);
+}
+.scenario-list button:hover{background:var(--grain),linear-gradient(180deg,#f7efd0,#e3d6ac)}
+.faction-index .scenario-list button{
+  font-family:var(--font-ui);
+  font-weight:700;
+  color:var(--sand-top);
+  background:var(--grain),linear-gradient(180deg,#363e22,#232918);
+  border:2px solid #0d0f08;
+  border-left:8px solid var(--sand-bot);
+  text-shadow:none;
+  box-shadow:0 4px 0 #0a0c06,0 8px 10px rgba(0,0,0,.4);
+}
+.faction-index .scenario-list button:hover{background:var(--grain),linear-gradient(180deg,#444d2b,#2c3320)}
+
+.rule-menu-icon{color:var(--sand-top)}
+.rule-menu-label{font-family:var(--font-ui);font-weight:700;font-size:1.12rem;letter-spacing:.08em}
+
+.scenario-content{
+  font-family:var(--font-body);
+  max-width:68ch;
+  margin-left:auto;
+  margin-right:auto;
+}
+.scenario-content strong{color:#5a1f19}
+.deployment-roll-prompt{
+  font-family:var(--font-type);
+  background:rgba(255,255,255,.22);
+  border:2px dashed #3a381d;
+  border-radius:2px;
+  letter-spacing:.08em;
+}
+.rule-table th{background:var(--o-800);color:var(--sand-top);font-family:var(--font-ui);letter-spacing:.08em;border-color:#0d0f08}
+.rule-table td{background:rgba(255,255,255,.30);color:var(--ink);border-color:#6e6540}
+
+/* Mapas de zonas: fotografía impresa con borde blanco */
+.deployment-zone-image,
+.deployment-zone-container{
+  border:8px solid #f1ebd6;
+  border-radius:2px;
+  background:#f1ebd6;
+  box-shadow:0 8px 16px rgba(0,0,0,.45);
+}
+.deployment-zone-container .deployment-zone-image{border:0;box-shadow:none}
+
+/* ---------- Facciones ---------- */
+.faction-page-heading{
+  background:var(--grain),linear-gradient(180deg,var(--o-600),var(--o-800));
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 3px 0 var(--edge),inset 0 0 22px rgba(0,0,0,.35);
+}
+.faction-page-heading span,.faction-page-heading small{font-family:var(--font-type);color:var(--sand-top);letter-spacing:.14em}
+.faction-page-heading h2{font-family:var(--font-stencil)!important;color:var(--stencil)!important;text-shadow:none!important}
+.faction-card{
+  background:rgba(10,12,6,.5);
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 0 0 1px rgba(125,113,65,.5),inset 0 0 14px rgba(0,0,0,.35);
+}
+.faction-card-title{background:linear-gradient(180deg,var(--o-600),var(--o-800));border:1px solid #0d0f08;border-radius:2px}
+.faction-card-title strong{font-family:var(--font-ui);font-weight:700;letter-spacing:.08em;color:var(--sand-top)}
+.faction-national{background:linear-gradient(180deg,var(--o-600),var(--o-800));border:2px solid #0d0f08;border-radius:3px}
+.faction-national h3{font-family:var(--font-ui);color:var(--sand-top)}
+
+/* ---------- Formularios: ficha mecanografiada ---------- */
+.field label{font-family:var(--font-ui);font-weight:700;letter-spacing:.08em;font-size:1.2rem}
+input,.setup-name-input{
+  font-family:var(--font-type);
+  background:linear-gradient(180deg,#f2ebd0,#e6dbb7);
+  color:var(--ink);
+  border:2px solid #3a381d;
+  border-radius:2px;
+  box-shadow:inset 0 2px 0 rgba(60,50,15,.18);
+}
+.setup-name-input::placeholder{color:#82764f}
+.initial-dice-control,
+.pre-counter{
+  border:2px solid #12140b;
+  border-radius:3px;
+  box-shadow:0 4px 0 #12140b;
+}
+.initial-dice-control strong,
+.pre-counter strong{
+  font-family:var(--font-stencil);
+  font-weight:700;
+  background:linear-gradient(180deg,#f2ebd0,#e6dbb7);
+}
+.initial-dice-control button,
+.pre-btn{
+  font-family:var(--font-ui);
+  font-weight:700;
+  border:0;
+  background:var(--grain),linear-gradient(180deg,var(--sand-top),var(--sand-bot));
+}
+
+/* ---------- Ronda / bolsa de dados ---------- */
+.turn-title{
+  font-family:var(--font-stencil);
+  font-weight:700;
+  color:var(--stencil);
+  text-shadow:0 3px 0 rgba(0,0,0,.55);
+}
+.counter{
+  font-family:var(--font-ui);
+  font-weight:600;
+  background:var(--grain),linear-gradient(180deg,#42602d,#27391a);
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 4px 0 #0a0c06,inset 0 0 0 3px rgba(255,255,255,.05),0 8px 10px rgba(0,0,0,.35);
+}
+.counter strong{font-family:var(--font-stencil);font-weight:700}
+.counter small{font-family:var(--font-type)}
+.player-2-counter{
+  background:var(--grain),linear-gradient(180deg,#8f3128,#571b16);
+  border:2px solid #0d0f08;
+}
+.counter-score{border-top:1px dashed rgba(236,230,207,.45)}
+
+.draw-area,.round-finish-area{
+  border:3px solid #0d0f08;
+  border-radius:3px;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(215,199,143,.16),transparent 62%),
+    var(--grain),
+    linear-gradient(180deg,#262c18,#12150b);
+  box-shadow:
+    0 0 0 1px var(--edge),
+    inset 0 0 0 5px #1b2010,
+    inset 0 0 0 6px rgba(215,199,143,.25),
+    inset 0 0 50px rgba(0,0,0,.7),
+    0 8px 18px rgba(0,0,0,.5);
+}
+.draw-area .player-name,
+.round-finish-title{
+  font-family:var(--font-stencil);
+  font-weight:700;
+  color:var(--stencil);
+}
+.curtain{background:#0a0c06}
+.extracted-summary{
+  background:rgba(0,0,0,.32);
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 0 0 1px rgba(125,113,65,.45);
+}
+.draw-actions button[data-action="end-round"]{
+  background:var(--grain),linear-gradient(180deg,#a2352b,#661d18);
+  border-color:#250907;
+  box-shadow:0 4px 0 #250907,0 9px 12px rgba(0,0,0,.4);
+  color:#f6e9d0;
+  text-shadow:none;
+}
+.dice-remove-action button{
+  font-weight:600;
+  color:var(--sand-top);
+  background:rgba(0,0,0,.35);
+  border:2px solid #0d0f08;
+  box-shadow:none;
+}
+.bottom-note{font-family:var(--font-type);color:#cfc6a8}
+
+/* ---------- Ajustes de dados, puntuación y ganador ---------- */
+.player-adjust{
+  background:linear-gradient(180deg,rgba(0,0,0,.26),rgba(0,0,0,.42));
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 0 0 1px rgba(125,113,65,.45);
+}
+.player-adjust .pname{font-family:var(--font-ui);font-weight:700;letter-spacing:.08em}
+.player-adjust .count{font-family:var(--font-stencil);font-weight:700}
+.notice{border-left:4px solid var(--stamp);background:rgba(0,0,0,.3)}
+.count-instruction{font-family:var(--font-body)}
+
+.score-adjust{
+  background:var(--grain),linear-gradient(180deg,#42602d,#27391a);
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 4px 0 #0a0c06;
+}
+.score-adjust.score-player-2{
+  background:var(--grain),linear-gradient(180deg,#8f3128,#571b16);
+  border-color:#0d0f08;
+}
+.score-player-name{font-family:var(--font-ui);font-weight:700;letter-spacing:.06em}
+.score-controls strong{font-family:var(--font-stencil)}
+.winner-scores > div{
+  background:rgba(0,0,0,.3);
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 0 0 1px var(--edge);
+}
+.winner-scores > div:nth-child(2){border-color:#0d0f08;box-shadow:0 0 0 1px #a8584a}
+.winner-scores span{font-family:var(--font-ui);font-weight:700;letter-spacing:.06em}
+.winner-scores strong{font-family:var(--font-stencil)}
+
+/* Ganador: sello rojo de goma, ligeramente torcido */
+body[data-screen="winner"] .panel .winner-announcement{
+  display:block;
+  width:fit-content;
+  max-width:100%;
+  margin:30px auto;
+  padding:12px 26px;
+  font-family:var(--font-stencil);
+  font-size:clamp(1.5rem,5vw,2.4rem);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#e4604a;
+  border:4px double #e4604a;
+  border-radius:4px;
+  transform:rotate(-2deg);
+  overflow-wrap:anywhere;
+}
+
+/* ---------- Reloj de partida: placa de instrumento ---------- */
+#globalClock{
+  background:linear-gradient(180deg,#14170d,#080a05);
+  border:2px solid var(--edge);
+  border-radius:3px;
+  box-shadow:0 0 0 2px #080a05,0 6px 14px rgba(0,0,0,.65),inset 0 0 12px rgba(0,0,0,.5);
+}
+#globalClock .clock-label{font-family:var(--font-type);color:var(--sand-top);letter-spacing:.12em}
+#globalClock .clock-value{font-family:var(--font-type);font-weight:400;color:var(--cream)}
+
+/* ---------- Navegación fija (volver / inicio) ---------- */
+.nav-button,
+body[data-screen] .nav-button{
+  background:var(--grain),linear-gradient(180deg,#363e22,#1c2112);
+  border:2px solid var(--edge);
+  border-radius:3px;
+  box-shadow:0 3px 0 #0a0c06,0 6px 10px rgba(0,0,0,.5);
+}
+.nav-button:hover{background:var(--grain),linear-gradient(180deg,#46502c,#262c18)}
+.nav-svg{stroke:var(--sand-top)}
+
+/* ---------- Ventanas modales ---------- */
+.remove-modal,
+.reset-confirm-modal{background:rgba(5,7,3,.88)}
+.reset-confirm-card,
+.remove-modal-card{
+  background:var(--grain),linear-gradient(165deg,var(--o-700),var(--o-950));
+  border:3px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:
+    0 0 0 1px var(--edge),
+    0 18px 44px #000,
+    inset 0 0 0 5px var(--o-800),
+    inset 0 0 0 6px rgba(215,199,143,.28);
+}
+.reset-confirm-card h2,
+.remove-modal-card h2{
+  font-family:var(--font-stencil);
+  color:var(--stencil);
+  text-shadow:none;
+  box-shadow:none;
+  border:0;
+  background:none;
+}
+.reset-confirm-actions .cancel-reset,
+.remove-modal-choices .cancel-remove{
+  color:var(--cream);
+  background:var(--grain),linear-gradient(180deg,#575a49,#363829);
+  border-color:#12140b;
+  box-shadow:0 4px 0 #0d0f08;
+}
+.resume-notice{
+  font-family:var(--font-type);
+  background:rgba(0,0,0,.4);
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 0 0 1px var(--edge);
+}
+.flank-choice{font-family:var(--font-ui);font-weight:700}
+.flank-game-tools{background:rgba(0,0,0,.3);border:2px solid #0d0f08;border-radius:3px}
+
+/* ---------- Nueva partida y despliegue inicial ---------- */
+.flow-note{font-family:var(--font-type);color:#43391f}
+.result-label{font-family:var(--font-type);color:#43391f}
+.result-chip{
+  background:var(--grain),linear-gradient(180deg,var(--o-700),var(--o-900));
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 0 0 1px var(--edge),inset 0 0 14px rgba(0,0,0,.35);
+}
+.result-chip span{font-family:var(--font-type);letter-spacing:.1em}
+.result-chip strong{font-family:var(--font-ui);font-weight:700;letter-spacing:.06em}
+.pre-box{
+  background:var(--grain),linear-gradient(180deg,var(--o-700),var(--o-900));
+  border:2px solid #0d0f08;
+  border-radius:3px;
+  box-shadow:0 0 0 1px var(--edge),inset 0 0 18px rgba(0,0,0,.35);
+}
+.panel .pre-box .pre-title{font-family:var(--font-stencil);text-shadow:none;letter-spacing:.07em}
+.pre-wave{font-family:var(--font-ui);font-weight:700;border:2px solid #0d0f08;border-radius:3px}
+.pre-wave strong{font-family:var(--font-stencil)}
+.pre-note{font-family:var(--font-body);border-left:4px solid var(--stamp);background:rgba(142,42,34,.12)}
+.pre-note-end{font-family:var(--font-type);border-left-color:var(--edge-dark)}
+
+/* ---------- PDF de reglas ---------- */
+.pdf-open-button{
+  font-family:var(--font-ui);
+  font-weight:700;
+  letter-spacing:.1em;
+  background:var(--grain),linear-gradient(180deg,var(--sand-top),var(--sand-bot));
+  border:2px solid #12140b;
+  border-radius:3px;
+  box-shadow:0 4px 0 #12140b,0 9px 12px rgba(0,0,0,.4);
+}
+.pdf-frame{border:3px solid #12140b;border-radius:2px;box-shadow:0 0 0 1px var(--edge)}
+.pdf-note{font-family:var(--font-type);color:#43391f}
+
+/* ---------- Pie ---------- */
+footer{font-family:var(--font-type);color:#d6ccae}
+footer strong{color:#d4ad4f !important;font-weight:400 !important;letter-spacing:.04em}
+
+/* ---------- Móvil ---------- */
+@media(max-width:560px){
+  .panel h2{padding-left:26px;padding-right:26px}
+  button,.menu-button{font-size:1.12rem}
+  header p{letter-spacing:.12em;gap:.6em;font-size:.82rem}
+}
+
+/* ---------- Ordenador ---------- */
+@media(min-width:900px){
+  .panel h2{padding-left:34px;padding-right:34px}
+  button,.menu-button{font-size:1.28rem}
+  .home-panel .menu-button:first-child{font-size:1.75rem}
+  .field label{font-size:1.4rem}
+}
+
+/* ---------- Accesibilidad ---------- */
+@media (prefers-reduced-motion:reduce){
+  button,.menu-button{transition:none}
+}
