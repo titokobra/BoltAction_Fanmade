@@ -36,7 +36,7 @@ const view = $('#view');
 //   screen=pantalla actual · p1/p2=nombres · d1/d2=dados iniciales (por defecto 8)
 //   round=ronda actual · remaining1/2=dados que quedan · bag=bolsa de dados
 //   drawn=dados ya sacados · last=último jugador que actuó · winner=resultado final
-const initialState = () => ({screen:'home',p1:'',p2:'',d1:12,d2:12,round:1,remaining1:12,remaining2:12,bag:[],drawn:[],deploymentPhase:null,last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,casualtyScore1:0,casualtyScore2:0,scoreApplied:false,endAfterCasualties:false});
+const initialState = () => ({screen:'home',p1:'',p2:'',d1:12,d2:12,round:1,remaining1:12,remaining2:12,bag:[],drawn:[],deploymentPhase:null,last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,casualtyScore1:0,casualtyScore2:0,scoreApplied:false,endAfterCasualties:false,missionModal:false});
 // Recupera la partida guardada en el navegador (localStorage) o crea una nueva.
 let state = JSON.parse(localStorage.getItem('ba_state') || 'null') || initialState();
 // ----- HISTORIAL DEL NAVEGADOR -------------------------------------------------
@@ -75,6 +75,7 @@ if(state.scoreApplied===undefined)state.scoreApplied=false;
 if(state.casualtyScore1===undefined)state.casualtyScore1=0;
 if(state.casualtyScore2===undefined)state.casualtyScore2=0;
 if(state.endAfterCasualties===undefined)state.endAfterCasualties=false;
+if(state.missionModal===undefined)state.missionModal=false;
 // ----- FUNCIONES AUXILIARES ----------------------------------------------------
 // save(): guarda el estado en el navegador (para no perder la partida al recargar).
 function save(){try{localStorage.setItem('ba_state',JSON.stringify(state))}catch(e){console.warn('No se pudo guardar el estado de la partida',e)}}
@@ -98,7 +99,27 @@ function scoreRow(player, name, score){
 // backButton(): dibuja la barra fija superior con los iconos de VOLVER (flecha)
 // e INICIO (casita). Para cambiar los iconos, edita los <path> de los SVG.
 // El aspecto (tamaño, color, posición) se cambia en css/tema-militar.css.
-function backButton(){return `<nav class="nav-stack" aria-label="Navegación"><button class="nav-button nav-back" data-action="back" aria-label="Volver" title="Volver"><svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="nav-button nav-home" data-action="go-home" aria-label="Inicio" title="Inicio"><svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2L12 4l8 7.2M6.5 9.8V20h4v-5.5h3V20h4V9.8"/></svg></button></nav>`}
+function missionDetails(){
+ const m=state.matchSetup||{};
+ let title='PARTIDA MANUAL',body='';
+ if(m.src==='base'){
+  title=`${m.n}. ${baseScenarioNames[m.n-1]||'Misión del juego base'}`;
+  body=baseScenarioTexts[m.n-1]||'';
+ }else if(m.src==='pack'){
+  const sc=(scenarioGroups[PACK_GROUP]||[]).find(x=>String(x[0])===String(m.n));
+  if(sc){title=`${sc[0]}. ${sc[1]}`;body=sc[2]||'';}
+ }else if(m.zone&&m.deploy){
+  body=`Zona de despliegue: ${ZONE_LABELS[m.zone]||m.zone}\nTipo de despliegue: ${DEPLOY_LABELS[m.deploy]||m.deploy}`;
+ }else{
+  body='No hay una misión concreta seleccionada para esta partida.';
+ }
+ return `<div class="mission-modal" role="dialog" aria-modal="true" aria-labelledby="missionModalTitle" style="position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box"><section class="panel" style="width:min(680px,100%);max-height:85vh;overflow:auto;position:relative"><button data-action="close-mission" aria-label="Cerrar misión" title="Cerrar" style="position:absolute;right:12px;top:12px;font-size:1.3rem;padding:8px 12px">✕</button><h2 id="missionModalTitle" style="padding-right:42px">MISIÓN</h2><h3>${esc(title)}</h3>${body?`<div class="scenario-content" style="white-space:pre-line">${esc(body)}</div>`:''}<div class="choice-row" style="justify-content:center">${btn('CERRAR','close-mission')}</div></section></div>`;
+}
+function backButton(){
+ const gameScreens=['round-title','draw','round-finished','count','count-confirm','casualties','finish-choice','winner'];
+ const showMission=gameScreens.includes(state.screen);
+ return `<nav class="nav-stack" aria-label="Navegación" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px"><button class="nav-button nav-back" data-action="back" aria-label="Volver" title="Volver"><svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>${showMission?`<button class="nav-button nav-mission" data-action="show-mission" aria-label="Misión" title="Consultar misión" style="justify-self:center;padding:8px 16px;min-width:90px;font-weight:700">MISIÓN</button>`:'<span></span>'}<button class="nav-button nav-home" data-action="go-home" aria-label="Inicio" title="Inicio" style="justify-self:end"><svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2L12 4l8 7.2M6.5 9.8V20h4v-5.5h3V20h4V9.8"/></svg></button></nav>${showMission&&state.missionModal?missionDetails():''}`;
+}
 // ----- RELOJ DE LA PARTIDA -----------------------------------------------------
 // formatClock(): convierte milisegundos en formato HH:MM:SS.
 function formatClock(ms){
@@ -553,9 +574,9 @@ function roundFinished(){
    ${scoreRow('p2',state.p2,state.roundScore2)}
   </div>
   <div class="draw-actions score-continue">
-   ${btn('RECUENTO BAJAS','open-casualties')}
+   ${state.round===7?btn('RECUENTO BAJAS','open-casualties'):btn('CONTINUAR','continue-round')}
   </div>
- </section>${backButton()}`;   // backButton(): iconos de volver e inicio, como en el resto de la web
+ </section>${backButton()}`;   // backButton(): iconos de volver, misión e inicio
  requestAnimationFrame(()=>{
   const c=$('#finishCurtain');
   if(c)c.classList.add('lift')
@@ -779,7 +800,7 @@ state.winner=null;
 state.score1=0;
 state.score2=0;
 state.scoreApplied=false;
-state.active=true;state.deploymentPhase=null;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.preGame=null;state.launched=false;state.screenBeforePause=null;state.screen='auto-ask';render()}
+state.active=true;state.deploymentPhase=null;state.bag=[];state.drawn=[];state.removeDieOpen=false;state.flankingEnabled=false;state.flankChoices={p1:null,p2:null};state.flankRevealed={p1:false,p2:false};state.flankStep=1;state.flankModal=false;state.flankSelected=null;state.flankPendingChoice=null;state.matchSetup={};state.preGame=null;state.launched=false;state.screenBeforePause=null;state.missionModal=false;state.screen='auto-ask';render()}
 // clamp(valor, mín, máx): mantiene un número dentro de un rango.
 // ¡Aquí no cambia el máximo! El 18 está en las llamadas clamp(…,1,18).
 function clamp(v,a,b){return Math.max(a,Math.min(b,Number.isFinite(v)?v:a))}
@@ -819,9 +840,15 @@ function openCasualties(){
   state.score2+=Number(state.roundScore2||0);
   state.scoreApplied=true;
  }
- // En ronda 6 se decide primero si la partida termina o se juega ronda 7.
- // Si se juega ronda 7, se omite el recuento de bajas de la ronda 6.
- state.screen=state.round===6?'finish-choice':'casualties';
+ // Rondas 1-5: nunca hay recuento de bajas; se pasa al recuento de dados.
+ // Ronda 6: primero se decide si termina la partida o se juega la ronda 7.
+ // Ronda 7: el recuento de bajas aparece al finalizar la partida.
+ if(state.round===6)state.screen='finish-choice';
+ else if(state.round===7)state.screen='casualties';
+ else{
+  state.remaining1=state.d1;state.remaining2=state.d2;state.countLimitNotice='';
+  state.screen='count';
+ }
  save();render();
 }
 function continueCasualties(){
@@ -853,6 +880,7 @@ function closeResetModal(){const modal=$('#resetConfirmModal');if(modal)modal.cl
 function confirmResetMatch(){closeResetModal();localStorage.removeItem('ba_state');state=initialState();render();updateGlobalClock() }
 // resetFinished(): botón VOLVER de la pantalla final; vuelve al inicio y reinicia el reloj.
 function resetFinished(){
+ state.missionModal=false;
  state.screen='home';
  state.screenBeforePause=null;
  state.timerStartedAt=null;
@@ -915,7 +943,9 @@ view.addEventListener('click',e=>{
  else if(a==='factions'){state.screen='factions';render()}
  else if(a==='rules-pdf'){state.screen='rules-pdf';render()}   // abre REFERENCIA REGLAS
  else if(a==='resume'){state.screen=state.screenBeforePause||(state.bag&&state.bag.length?'draw':'round-title');state.resumeNotice=true;render()}
- else if(a==='go-home'){if(['draw','round-title','round-finished','casualties','count','count-confirm','finish-choice','winner','auto-ask','auto-mode','zone-pick','deploy-pick','auto-result','predeploy'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
+ else if(a==='go-home'){if(['draw','round-title','round-finished','casualties','count','count-confirm','finish-choice','winner','auto-ask','auto-mode','zone-pick','deploy-pick','auto-result','predeploy'].includes(state.screen))state.screenBeforePause=state.screen;state.missionModal=false;state.screen='home';render()}
+ else if(a==='show-mission'){state.missionModal=true;render()}
+ else if(a==='close-mission'){state.missionModal=false;render()}
  // Botón REINICIAR PARTIDA y navegación Volver / Inicio / Continuar
  else if(a==='reset')resetMatch()
   else if(a==='back'){
@@ -988,9 +1018,14 @@ else if(b.dataset.score){
  else if(a==='count-confirm-yes')acceptCount()
  else if(a==='count-confirm-no'){state.screen='count';render()}
 else if(a==='end-match'){
+ if(!state.scoreApplied){
+  state.score1+=Number(state.roundScore1||0);
+  state.score2+=Number(state.roundScore2||0);
+  state.scoreApplied=true;
+ }
  state.endAfterCasualties=true;
  state.screen='casualties';
- render();
+ save();render();
 }
  else if(a==='round-seven'){state.endAfterCasualties=false;state.remaining1=state.d1;state.remaining2=state.d2;state.countLimitNotice='';state.screen='count';render()}   // turno 7: se omite bajas de ronda 6 y se cuentan dados
  // --- Pantalla final: elegir resultado y volver ---
