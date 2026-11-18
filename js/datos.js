@@ -30,8 +30,8 @@ PUNTUACIÓN:
 Si un jugador tiene al menos 2 puntos más que el otro, se considera una victoria clara. En caso contrario, el resultado se considera demasiado ajustado: empate.
 
 DESPLIEGUE:
-Zona: Tirar en tabla.
-Tipo: Tirar en tabla.
+Zona de Despliegue: Tirar en la tabla.
+Tipo de Despliegue: Tirar en la tabla.
 
 REGLAS ESPECIALES
 Despliegue avanzado: Sí
@@ -50,8 +50,8 @@ PUNTUACIÓN:
 Si un jugador tiene al menos 2 puntos más que el otro, se considera una victoria clara. En caso contrario, el resultado se considera demasiado ajustado: empate.
 
 DESPLIEGUE:
-Zona: Tirar en tabla.
-Tipo: Tirar en tabla.
+Zona de Despliegue: Tirar en la tabla.
+Tipo de Despliegue: Tirar en la tabla.
 
 REGLAS ESPECIALES
 Despliegue avanzado: Sí
@@ -72,8 +72,8 @@ Al final de la partida, si controlas más objetivos que tu oponente, ganas. En
 caso contrario, el resultado es empate.
 
 DESPLIEGUE:
-Zona: Tirar en tabla.
-Tipo: Tirar en tabla.
+Zona de Despliegue: Tirar en la tabla.
+Tipo de Despliegue: Tirar en la tabla.
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -130,8 +130,8 @@ Para facilitar a jugabilidad aportamos las dos opciones existente según la situ
 • 5 Puntos por destruir la base enemiga
 
 TIPO DE DESPLIEGUE:
-Zona de Despliegue Tipo de Despliegue
-Tirar en tabla Tirar en Tabla
+Zona de Despliegue: Tirar en la tabla.
+Tipo de Despliegue: Tirar en la tabla.
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -161,8 +161,8 @@ Para facilitar a jugabilidad aportamos las dos opciones existente según la situ
 • 5 Puntos por destruir la base enemiga
 
 TIPO DE DESPLIEGUE:
-Zona de Despliegue Tipo de Despliegue
-Tirar en tabla Tirar en Tabla
+Zona de Despliegue: Tirar en la tabla.
+Tipo de Despliegue: Tirar en la tabla.
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -180,8 +180,8 @@ CONDICIONES DE VICTORIA:
 Aquel que controle el objetivo central.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Tirar en tabla Tirar en Tabla
+Zona de Despliegue: Tirar en la tabla.
+Tipo de Despliegue: Tirar en la tabla.
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -294,8 +294,8 @@ PUNTUACIÓN:
 • 5 puntos, Controlar Objetivos
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Cuadrantes Posiciones preparadas+Reservas
+Zona de Despliegue: Cuadrantes
+Tipo de Despliegue: Posiciones preparadas+Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -333,8 +333,8 @@ oponente, gana.
 En caso contrario, es un empate.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Posiciones preparadas+Reservas
+Zona de Despliegue: Borde Largo
+Tipo de Despliegue: Posiciones preparadas+Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -375,8 +375,8 @@ Si un jugador obtiene 2 o más puntos más que su oponente, gana la partida.
 En caso contrario, termina en empate.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Cuadrantes Posiciones preparadas+Reservas
+Zona de Despliegue: Cuadrantes
+Tipo de Despliegue: Posiciones preparadas+Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -442,8 +442,8 @@ No puede haber miniaturas enemigas de ningún tipo dentro de ese mismo rango.
 Los vehículos no pueden controlar objetivos, pero sí pueden negarlos si están a 3” del borde.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Cuadrantes Encuentro comprometido / 1ª oleada + Reservas
+Zona de Despliegue: Cuadrantes
+Tipo de Despliegue: Encuentro comprometido / 1ª oleada + Reservas 
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -480,8 +480,8 @@ Para controlar un objetivo, se requiere:
 - A 3" o menos del borde del objetivo Ninguna unidad enemiga de ningún tipo puede estar a esa misma distancia del objetivo
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Posiciones preparadas+Reservas
+Zona de Despliegue: Borde Largo 
+Tipo de Despliegue: Posiciones preparadas+Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -520,8 +520,7 @@ Los objetivos se consideran disputados si hay una unidad de infantería o artill
 
 TIPO DE DESPLIEGUE :
 Zona de Despliegue: Borde Largo
-Tipo de Despliegue: Posiciones preparadas
-ADAPTADO+Reservas
+Tipo de Despliegue: Posiciones preparadas ADAPTADO+Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -722,8 +721,8 @@ Para sacar un objetivo de la mesa TODAS las miniaturas de la unidad deben alcanz
 Es válido subir a un transporte con un objetivo pero para sacarlo de la mesa, la unidad debe desembarcar y tocar la DBZ tras un ADVANCED o RUN.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Encuentro comprometido / 1ª oleada + Reservas
+Zona de Despliegue: Borde Largo
+Tipo de Despliegue: Encuentro comprometido / 1ª oleada + Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -747,8 +746,8 @@ Victoria si un jugador destruye mas objetivos que el rival gana
 Empate si ambos jugadores destruyen el mismo numero de objetivos
 
 TIPO DE DESPLIEGUE
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Encuentro comprometido / 1ª oleada + Reservas
+Zona de Despliegue: Borde Largo 
+Tipo de Despliegue: Encuentro comprometido / 1ª oleada + Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -775,8 +774,9 @@ PUNTUACIÓN:
 • Capitán 3 puntos
 
 TIPO DE DESPLIEGUE
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Encuentro Comprometido 1º oleada + Reservas
+Zona de Despliegue: Borde Largo 
+Tipo de Despliegue: Encuentro Comprometido 1º oleada + Reservas
+
 
 REGLAS ESPECIALES:
 • Niebla de guerra/Combate confuso: Todas las unidades que entren desde reserva pueden hacerlo por cualquier borde de la mesa, excepto por el borde desde el que haya entrado la última reserva enemiga ese mismo turno. Al inicio del siguiente turno se resetea esta condición.
@@ -802,8 +802,10 @@ Nota
 
 Aquel que saque mas marcador de papeles gana,
 Deben Jugarse 6 turnos y tirar para el posible 7 turno.
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Posiciones Preparadas + Reservas
+
+TIPO DE DESPLIEGUE
+Zona de Despliegue: Borde Largo 
+Tipo de Despliegue: Posiciones Preparadas + Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -822,9 +824,9 @@ Tener una diferencia de 2 o mas puntos con el rival
 • 2 puntos por unidades a 12” del la base (tanto si es destruida como si sigue en mesa)
 • 5 Puntos por destruir la base enemiga
 
-TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Posiciones preparadas + reservas
+TIPO DE DESPLIEGUE
+Zona de Despliegue: Borde Largo 
+Tipo de Despliegue: Posiciones Preparadas + Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -979,9 +981,12 @@ Permanecerá bajo tu control hasta el final de la partida, o hasta que una unida
 Al final de la partida, si controlas más objetivos que tu adversario, ganas; de lo contrario, la partida queda en tablas.`,
  
 `Ambos jugadores deben intentar mover el mayor número de sus unidades fuera de la mesa desde el borde de la zona de despliegue (BZD para abreviar) del jugador enemigo, como se muestra en los mapas de la página 169, o al menos entrar en la zona de despliegue enemiga. Nótese que en este escenario, se permite a las unidades mover deliberadamente fuera de la BZD del jugador enemigo para alcanzar su objetivo - para hacerlo, la unidad debe recibir la orden de Avanzar o Correr, y entonces todos los modelos de la unidad necesitan mover en contacto con la BZD del jugador enemigo. 
-  Ten en cuenta también que en Ruptura, las unidades no pueden ponerse en reserva (ver página 172), por lo que si obtienes un resultado de Niebla de Guerra para el tipo de despliegue,  endrás que volver a tirar el dado hasta que obtengas un nuevo resultado. Ganas 3 puntos de victoria por cada unidad tuya que haya salido del BZD enemigo antes del final de la partida.
+
+Ten en cuenta también que en Ruptura, las unidades no pueden ponerse en reserva (ver página 172), por lo que si obtienes un resultado de Niebla de Guerra para el tipo de despliegue,  endrás que volver a tirar el dado hasta que obtengas un nuevo resultado. Ganas 3 puntos de victoria por cada unidad tuya que haya salido del BZD enemigo antes del final de la partida.
+
 También ganas 1 punto de victoria por cada unidad propia que al final de la partida esté completamente dentro de la zona de despliegue enemiga.
 Al final de la partida, calcula qué bando ha ganado sumando los puntos de victoria como se ha descrito anteriormente. 
+
 Si un bando obtiene al menos 2 puntos de victoria más que el otro, entonces ese bando ha obtenido una clara victoria. En caso contrario, el resultado se considera demasiado ajustado y se reparten los honores: ¡empate!`,
  
 `Aviones enemigos han derribado uno de nuestros aviones de transporte ligero. Nuestros hombres deben localizar el lugar del accidente y recuperar el maletín del oficial de Estado Mayor de alto rango que iba a bordo. Este maletín contiene documentos secretos y es imperativo que lleguemos a él antes que el enemigo. Pase lo que pase, estos documentos no deben caer en manos enemigas.
