@@ -198,10 +198,12 @@ despliegue del defensor o salir del campo de batalla por el borde de la mesa
 enemigo. El defensor debe intentar impedirlo.
 Durante el Turno 1, el atacante debe introducir su primera oleada en la
 mesa.
-Duracion:
+
+DURACIÓN:
 La partida dura inicialmente 6 turnos. Al final del turno 6, lanza un dado:
 • Con un 1, 2 o 3, la partida termina.
 • Con un 4, 5 o 6, se juega un turno adicional.
+
 PUNTUACIÓN:
 El atacante obtiene:
 • 1 punto por cada unidad enemiga destruida
@@ -213,6 +215,7 @@ enemigo (todos los modelos deben estar tocando el borde)
 • 2 puntos por cada unidad enemiga destruida
 Si un jugador termina con 2 o más puntos de ventaja sobre el otro, se
 considera una victoria clara. En caso contrario, la partida termina en empate.
+
 TIPO DE DESPLIEGUE:
 El defensor elige un lado de la mesa y despliega al menos la mitad de sus
 unidades en su zona de despliegue. Estas unidades pueden usar Despliegue
@@ -279,17 +282,21 @@ Los objetivos se controlan como en POSICIONES CLAVE (misión
 2) La partida dura 6 turnos. Al final del turno 6, lanza un dado:
 • Con un 1, 2 o 3, la partida termina.
 • Con un 4, 5 o 6, se juega un turno adicional.
-Victoria
+
+VICTORIA:
 Conseguir más puntos que el rival con una diferencia de 3 o más puntos para
 ganar.
+
 PUNTUACIÓN:
 • 1 punto, Unidades de infantería
 • 2 puntos, tenientes, vehículos soft skin y artillería
 • 3 puntos, Vehículos de blindaje 7+ y capitanes
 • 5 puntos, Controlar Objetivos
+
 TIPO DE DESPLIEGUE :
 Zona de Despliegue Tipo de Despliegue
 Cuadrantes Posiciones preparadas+Reservas
+
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
 Flanqueo: Sí
@@ -313,6 +320,7 @@ flanqueo.
 La partida dura 6 turnos. Al final del turno 6, uno de los jugadores lanza un dado:
 • Con un 4, 5 o 6, se juega un turno adicional.
 • En cualquier otro resultado, la partida termina.
+
 PUNTUACIÓN:
 • 1 punto por cada una de tus unidades que termine la partida fuera de ambas
 zonas de despliegue
@@ -323,9 +331,11 @@ sus miniaturas están dentro de la zona correspondiente)
 Si un jugador termina la partida con 3 o más puntos de ventaja sobre su
 oponente, gana.
 En caso contrario, es un empate.
+
 TIPO DE DESPLIEGUE :
 Zona de Despliegue Tipo de Despliegue
 Borde Largo Posiciones preparadas+Reservas
+
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
 Flanqueo: Sí
@@ -351,6 +361,7 @@ desplegadas.
 La partida dura 6 turnos. Al final del turno 6, lanza un dado:
 • Con un 1, 2 o 3, la partida termina.
 • Con un 4, 5 o 6, se juega un turno adicional.
+
 PUNTUACIÓN:
 • 1 punto por cada unidad enemiga destruida
 • 1 punto por cada unidad amiga completamente dentro de uno de los dos
@@ -362,9 +373,11 @@ aquel donde tenga la mayoría de sus modelos (o, si es una unidad de un solo
 modelo, donde esté su base).
 Si un jugador obtiene 2 o más puntos más que su oponente, gana la partida.
 En caso contrario, termina en empate.
+
 TIPO DE DESPLIEGUE :
 Zona de Despliegue Tipo de Despliegue
 Cuadrantes Posiciones preparadas+Reservas
+
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
 Flanqueo: No
@@ -767,7 +780,6 @@ Borde Largo Encuentro Comprometido 1º oleada + Reservas
 
 REGLAS ESPECIALES:
 • Niebla de guerra/Combate confuso: Todas las unidades que entren desde reserva pueden hacerlo por cualquier borde de la mesa, excepto por el borde desde el que haya entrado la última reserva enemiga ese mismo turno. Al inicio del siguiente turno se resetea esta condición.
-
 Despliegue avanzado: Sí
 Flanqueo: Niebla de guerra/Combate Confuso
 Despliegue oculto: No
