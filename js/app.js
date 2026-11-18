@@ -172,6 +172,7 @@ function render(){
   if(state.screen==='draw') return draw();
   if(state.screen==='round-finished') return roundFinished();
   if(state.screen==='count') return countScreen();
+  if(state.screen==='count-confirm') return countConfirmScreen();
   if(state.screen==='finish-choice') return finishChoice();
   if(state.screen==='winner') return winner();
 }
@@ -184,10 +185,10 @@ function home(){
  view.innerHTML=`<section class="panel home-panel"><div class="menu-grid">
  <button class="menu-button" data-action="start">COMENZAR PARTIDA</button>
  <button class="menu-button reset-home-button" data-action="reset">REINICIAR PARTIDA</button>
- <button class="menu-button" data-action="scenario-groups">ELECCIÓN DE ESCENARIOS</button>
+ <button class="menu-button" data-action="scenario-groups">LISTAS DE ESCENARIOS</button>
  <button class="menu-button" data-action="zones-menu">ZONAS DE DESPLIEGUE</button>
  <button class="menu-button" data-action="deployment-menu">TIPO DE DESPLIEGUE</button>
- <button class="menu-button" data-action="rules-menu">REGLAS</button>
+ <button class="menu-button" data-action="rules-menu">REGLAS / PDF</button>
  </div>${state.active?`<div class="home-actions">${btn('CONTINUAR PARTIDA','resume')}</div>`:''}</section>${startWarnOpen?startWarnModal():''}`;
 }
 // LISTA DE FACCIONES (Reglas > Reglas de facciones). Se genera sola a partir de
@@ -210,13 +211,13 @@ function factionDetail(){
 }
 // MENÚ DE REGLAS: Facciones / Armas / Unidades / Vehículos.
 // Para añadir una categoría nueva: añade aquí el botón y créala en specialRules (datos.js).
-function rulesMenu(){view.innerHTML=`<section class="panel"><h2>REGLAS</h2><div class="menu-grid">
+function rulesMenu(){view.innerHTML=`<section class="panel"><h2>REGLAS / PDF</h2><div class="menu-grid">
  <button class="menu-button rule-menu-button" data-action="factions"><span class="rule-menu-label">REGLAS DE FACCIONES</span></button>
  <button class="menu-button rule-menu-button" data-rule-category="REGLAS DE ARMAS"><span class="rule-menu-label">REGLAS DE ARMAS</span></button>
  <button class="menu-button rule-menu-button" data-rule-category="REGLAS DE UNIDADES"><span class="rule-menu-label">REGLAS DE UNIDADES</span></button>
  <button class="menu-button rule-menu-button" data-rule-category="REGLAS DE VEHÍCULOS"><span class="rule-menu-label">REGLAS DE VEHÍCULOS</span></button>
   <!-- Botón que abre el PDF de referencia (pantalla 'rules-pdf') -->
-  <button class="menu-button rule-menu-button" data-action="rules-pdf"><span class="rule-menu-label">REFERENCIA REGLAS</span></button>
+  <button class="menu-button rule-menu-button" data-action="rules-pdf"><span class="rule-menu-label">REFERENCIAS RÁPIDAS (PDF)</span></button>
  </div></section>${backButton()}`}
 // LISTA DE REGLAS de una categoría (ordenadas alfabéticamente). Datos: specialRules.
 function rulesList(){const cat=state.ruleCategory;const entries=Object.entries(specialRules[cat]||{}).sort((a,b)=>a[0].localeCompare(b[0],'es'));view.innerHTML=`<section class="panel"><h2>${esc(cat)}</h2><div class="scenario-list">${entries.map(([name])=>`<button data-rule-name="${esc(name)}">${esc(name)}</button>`).join('')}</div></section>${backButton()}`}
@@ -229,8 +230,8 @@ function rulesDetail(){const cat=state.ruleCategory,name=state.ruleName,body=spe
 //  - En móvil/tablet muchos navegadores no muestran PDFs incrustados, por eso
 //    hay un botón 'ABRIR PDF' que lo abre en una pestaña nueva (se oculta el marco).
 function rulesPdf(){
-  view.innerHTML=`<section class="panel pdf-panel"><h2>REFERENCIA REGLAS</h2>
-  <a class="pdf-open-button" href="${REGLAS_PDF}" target="_blank" rel="noopener">REFERENCIAS RÁPIDAS</a>
+  view.innerHTML=`<section class="panel pdf-panel"><h2>REFERENCIAS RÁPIDAS (PDF)</h2>
+  <a class="pdf-open-button" href="${REGLAS_PDF}" target="_blank" rel="noopener">REFERENCIAS RÁPIDAS (PDF)</a>
   <iframe class="pdf-frame" src="${REGLAS_PDF}" title="Referencia de reglas"></iframe>
   <p class="pdf-note">Si no se ve el documento, usa el botón de arriba.</p></section>${backButton()}`;
 }
@@ -302,7 +303,7 @@ function deploymentDetail(){
 }
 
 // ELECCIÓN DE ESCENARIOS: lista de grupos (juego base y otros). Datos: scenarioGroups.
-function groups(){view.innerHTML=`<section class="panel"><h2>ELECCIÓN DE ESCENARIOS</h2><div class="menu-grid">${Object.keys(scenarioGroups).map(g=>`<button class="menu-button" data-group="${esc(g)}">${g}</button>`).join('')}</div></section>${backButton()}`}
+function groups(){view.innerHTML=`<section class="panel"><h2>LISTAS DE ESCENARIOS</h2><div class="menu-grid">${Object.keys(scenarioGroups).map(g=>`<button class="menu-button" data-group="${esc(g)}">${g}</button>`).join('')}</div></section>${backButton()}`}
 
 // LISTA DE ESCENARIOS DEL JUEGO BASE (se elige con un D6).
 function baseScenarioList(){view.innerHTML=`<section class="panel"><h2>ESCENARIOS JUEGO BASE</h2><p class="deployment-roll-prompt">TIRAR UN DADO D6</p><div class="scenario-list">${baseScenarioNames.map((name,i)=>`<button data-base-scenario="${i+1}">${i+1}. ${name}</button>`).join('')}</div></section>${backButton()}`}
@@ -394,7 +395,7 @@ function flankingRevealModal(){if(!state.flankModal)return '';if(!state.flankSel
 function autoAsk(){
   view.innerHTML=`<section class="panel flow-panel"><h2>¿Que decidan los dados?</h2>
   <p class="flow-intro">Sorteamos misión y despliegue al azar, o los eliges tú antes de desplegar las tropas.</p>
-  <div class="choice-row">${btn('SORTEAR','auto-yes')}${btn('ELEGIR A MANO','auto-no')}</div></section>${backButton()}`;
+  <div class="choice-row">${btn('SORTEAR','auto-yes')}<button class="manual-choice-button" data-action="auto-no"><strong>MANUALMENTE</strong><small>(En el menú principal se encuentran los escenarios)</small></button></div></section>${backButton()}`;
 }
 // 2) Si dijo SÍ: de dónde sacar la misión. Los textos de los botones se cambian aquí.
 function autoMode(){
@@ -474,9 +475,10 @@ view.innerHTML=`<section class="panel">${state.deploymentPhase==='first-wave'?'<
  ${state.removeDieOpen?`<div class="remove-modal" role="dialog" aria-modal="true" aria-labelledby="removeDieTitle"><div class="remove-modal-card"><h2 id="removeDieTitle">¿A qué jugador quieres eliminar un dado?</h2><div class="remove-modal-choices">${btn(esc(state.p1),'remove-p1','') .replace('<button ','<button '+(state.bag.includes('p1')?'':'disabled '))}${btn(esc(state.p2),'remove-p2','').replace('<button ','<button '+(state.bag.includes('p2')?'':'disabled '))}${btn('CANCELAR','cancel-remove-die','cancel-remove')}</div><p class="remove-help">El dado se resta inmediatamente de la bolsa de esta ronda y del contador visible. No modifica el recuento que se utilizará para preparar la siguiente ronda.</p></div></div>`:''}${flankingRevealModal()}${backButton()}`;
 }
 // DADOS PARA LA SIGUIENTE RONDA: cada jugador indica cuántos dados le quedan.
-function countScreen(){view.innerHTML=`<section class="panel"><h2>DADOS PARA LA SIGUIENTE RONDA</h2><p class="count-instruction">Hecho el recuento de bajas, indica cuántos dados de orden conserva cada jugador para la próxima ronda. Las bajas no se recuperan: no puedes superar los dados con los que empezaste esta ronda.</p>
- ${adjustRow('p1',state.p1,state.remaining1)}<small class="muted">Máximo de ${esc(state.p1)}: ${state.roundStart1}</small>${adjustRow('p2',state.p2,state.remaining2)}<small class="muted">Máximo de ${esc(state.p2)}: ${state.roundStart2}</small>${state.countLimitNotice?`<p class="notice" role="alert">${esc(state.countLimitNotice)}</p>`:''}
+function countScreen(){view.innerHTML=`<section class="panel"><h2>DADOS PARA LA SIGUIENTE RONDA</h2><p class="count-instruction">El recuento comienza con el máximo de dados con el que empezó cada jugador. Resta los dados que haya perdido cada uno.</p>
+ ${adjustRow('p1',state.p1,state.remaining1)}<small class="muted">Máximo de ${esc(state.p1)}: ${state.d1}</small>${adjustRow('p2',state.p2,state.remaining2)}<small class="muted">Máximo de ${esc(state.p2)}: ${state.d2}</small>${state.countLimitNotice?`<p class="notice" role="alert">${esc(state.countLimitNotice)}</p>`:''}
  <div class="choice-row">${btn('CONFIRMAR Y CONTINUAR','confirm-count')}</div></section>${backButton()}`}
+function countConfirmScreen(){view.innerHTML=`<section class="panel flow-panel"><h2>¿SON CORRECTOS LOS CAMBIOS?</h2><p class="flow-intro">${esc(state.p1)}: ${state.remaining1} dados · ${esc(state.p2)}: ${state.remaining2} dados</p><div class="choice-row">${btn('SÍ, COMENZAR SIGUIENTE RONDA','count-confirm-yes')}${btn('NO, VOLVER A MODIFICAR','count-confirm-no')}</div></section>${backButton()}`}
 // adjustRow(): una fila con nombre del jugador y botones − / + (se usa en countScreen).
 function adjustRow(id,name,val){return `<div class="player-adjust"><button data-adjust="${id}" data-delta="-1" aria-label="Restar">−</button><div><div class="pname">${esc(name)}</div><div class="count">${val}</div></div><button data-adjust="${id}" data-delta="1" aria-label="Sumar">+</button></div>`}
 // FINAL DE LA RONDA 6: ya hecho el recuento de puntos, pregunta si hay turno 7.
@@ -812,8 +814,9 @@ function continueRound(){
   // Tras el recuento de la ronda 6 se pregunta si hay turno 7 (los dados se cuentan solo si lo hay)
   state.screen='finish-choice';
  }else{
-  state.remaining1=0;
-  state.remaining2=0;
+  state.remaining1=state.d1;
+  state.remaining2=state.d2;
+  state.countLimitNotice='';
   state.screen='count';
  }
 
@@ -821,7 +824,8 @@ function continueRound(){
  render();
 }
 // confirmCount(): confirma los dados y pasa a la siguiente ronda (la pregunta del turno 7 ya se hizo antes).
-function confirmCount(){state.round++;state.screen='round-title';render()}
+function confirmCount(){state.screen='count-confirm';render()}
+function acceptCount(){state.round++;state.screen='round-title';save();render()}
 // ----- REINICIAR PARTIDA (ventana de confirmación definida en index.html) ------
 // resetMatch abre la ventana · closeResetModal la cierra · confirmResetMatch borra todo.
 function resetMatch(){const modal=$('#resetConfirmModal');if(modal)modal.classList.add('open')}
@@ -923,7 +927,7 @@ state[key]=clamp(state[key]+delta,1,50);
  else if(a==='auto-both'){state.matchSetup=rollBoth();state.screen='auto-result';render()}
  else if(a==='launch')launchMatch()
  else if(a==='pre-adj')preAdjust(b.dataset.p,b.dataset.k,+b.dataset.d)   // − / + de la prepartida
- else if(a==='pre-continue'){if(preValid()){if(noReserveMission(state.matchSetup||{}))startRound1();else startFirstWave()}} // Ruptura no tiene fase de primera oleada
+ else if(a==='pre-continue'){if(preValid())startFirstWave()}       // CONTINUAR → Primera oleada
  else if(a==='start-round-1')startRound1()                              // SIGUIENTE → Ronda 1
  // --- Flanqueo ---
  else if(a==='flanking-yes'){state.flankingEnabled=true;state.flankStep=1;state.screen='flanking-choose';render()}
@@ -956,12 +960,14 @@ else if(b.dataset.score){
  else if(a==='end-round')endRound()
  else if(a==='continue-round')continueRound()
  else if(a==='confirm-count')confirmCount()
+ else if(a==='count-confirm-yes')acceptCount()
+ else if(a==='count-confirm-no'){state.screen='count';render()}
 else if(a==='end-match'){
  state.timerStoppedAt=Date.now();
  state.screen='winner';
  render();
 }
- else if(a==='round-seven'){state.remaining1=0;state.remaining2=0;state.countLimitNotice='';state.screen='count';render()}   // turno 7: primero se cuentan los dados
+ else if(a==='round-seven'){state.remaining1=state.d1;state.remaining2=state.d2;state.countLimitNotice='';state.screen='count';render()}   // turno 7: primero se cuentan los dados
  // --- Pantalla final: elegir resultado y volver ---
  else if(a==='win-p1'){state.winner=state.p1;render()}
  else if(a==='win-p2'){state.winner=state.p2;render()}
@@ -980,7 +986,7 @@ else if(a==='end-match'){
  else if(b.dataset.group){state.group=b.dataset.group;if(b.dataset.group==='ESCENARIOS JUEGO BASE')state.screen='base-scenario-list';else state.screen='scenario-list';render()}
  else if(b.dataset.baseScenario){state.baseScenario=b.dataset.baseScenario;state.screen='base-scenario-detail';render()}
  else if(b.dataset.scenario){state.scenario=b.dataset.scenario;state.screen='scenario-detail';render()}
- else if(b.dataset.adjust){const player=b.dataset.adjust, key=player==='p1'?'remaining1':'remaining2',limit=player==='p1'?state.roundStart1:state.roundStart2,next=state[key]+Number(b.dataset.delta);if(next>limit){state.countLimitNotice='Sin refuerzos: no puedes tener más dados de orden que al empezar la ronda.';}else{state[key]=clamp(next,0,limit);state.countLimitNotice='';}render()}
+ else if(b.dataset.adjust){const player=b.dataset.adjust, key=player==='p1'?'remaining1':'remaining2',limit=player==='p1'?state.d1:state.d2,next=state[key]+Number(b.dataset.delta);if(next>limit){state.countLimitNotice='Sin refuerzos: no puedes tener más dados de orden que al empezar la ronda.';}else{state[key]=clamp(next,0,limit);state.countLimitNotice='';}render()}
 });
 render();
 updateGlobalClock();
