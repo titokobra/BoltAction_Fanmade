@@ -36,7 +36,7 @@ const view = $('#view');
 //   screen=pantalla actual · p1/p2=nombres · d1/d2=dados iniciales (por defecto 8)
 //   round=ronda actual · remaining1/2=dados que quedan · bag=bolsa de dados
 //   drawn=dados ya sacados · last=último jugador que actuó · winner=resultado final
-const initialState = () => ({screen:'home',p1:'',p2:'',d1:12,d2:12,round:1,remaining1:12,remaining2:12,bag:[],drawn:[],deploymentPhase:null,last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,scoreApplied:false});
+const initialState = () => ({screen:'home',p1:'',p2:'',d1:12,d2:12,round:1,remaining1:12,remaining2:12,bag:[],drawn:[],deploymentPhase:null,last:null,mode:'',winner:null,active:false,removeDieOpen:false,flankingEnabled:false,flankChoices:{p1:null,p2:null},flankRevealed:{p1:false,p2:false},flankStep:1,flankModal:false,flankSelected:null,flankPendingChoice:null,timerStartedAt:null,timerStoppedAt:null,roundStart1:8,roundStart2:8,countLimitNotice:'',score1:0,score2:0,roundScore1:0,roundScore2:0,casualtyScore1:0,casualtyScore2:0,scoreApplied:false,endAfterCasualties:false});
 // Recupera la partida guardada en el navegador (localStorage) o crea una nueva.
 let state = JSON.parse(localStorage.getItem('ba_state') || 'null') || initialState();
 // ----- HISTORIAL DEL NAVEGADOR -------------------------------------------------
@@ -72,6 +72,9 @@ if (state.score2 === undefined) state.score2 = 0;
 if(state.roundScore1===undefined)state.roundScore1=0;
 if(state.roundScore2===undefined)state.roundScore2=0;
 if(state.scoreApplied===undefined)state.scoreApplied=false;
+if(state.casualtyScore1===undefined)state.casualtyScore1=0;
+if(state.casualtyScore2===undefined)state.casualtyScore2=0;
+if(state.endAfterCasualties===undefined)state.endAfterCasualties=false;
 // ----- FUNCIONES AUXILIARES ----------------------------------------------------
 // save(): guarda el estado en el navegador (para no perder la partida al recargar).
 function save(){try{localStorage.setItem('ba_state',JSON.stringify(state))}catch(e){console.warn('No se pudo guardar el estado de la partida',e)}}
@@ -173,6 +176,7 @@ function render(){
   if(state.screen==='round-finished') return roundFinished();
   if(state.screen==='count') return countScreen();
   if(state.screen==='count-confirm') return countConfirmScreen();
+  if(state.screen==='casualties') return casualtiesScreen();
   if(state.screen==='finish-choice') return finishChoice();
   if(state.screen==='winner') return winner();
 }
@@ -475,16 +479,34 @@ view.innerHTML=`<section class="panel">${state.deploymentPhase==='first-wave'?'<
  ${state.removeDieOpen?`<div class="remove-modal" role="dialog" aria-modal="true" aria-labelledby="removeDieTitle"><div class="remove-modal-card"><h2 id="removeDieTitle">¿A qué jugador quieres eliminar un dado?</h2><div class="remove-modal-choices">${btn(esc(state.p1),'remove-p1','') .replace('<button ','<button '+(state.bag.includes('p1')?'':'disabled '))}${btn(esc(state.p2),'remove-p2','').replace('<button ','<button '+(state.bag.includes('p2')?'':'disabled '))}${btn('CANCELAR','cancel-remove-die','cancel-remove')}</div><p class="remove-help">El dado se resta inmediatamente de la bolsa de esta ronda y del contador visible. No modifica el recuento que se utilizará para preparar la siguiente ronda.</p></div></div>`:''}${flankingRevealModal()}${backButton()}`;
 }
 // DADOS PARA LA SIGUIENTE RONDA: cada jugador indica cuántos dados le quedan.
-function countScreen(){view.innerHTML=`<section class="panel"><h2>DADOS PARA LA SIGUIENTE RONDA</h2><p class="count-instruction">El recuento comienza con el máximo de dados con el que empezó cada jugador. Resta los dados que haya perdido cada uno.</p>
+function countScreen(){view.innerHTML=`<section class="panel"><h2>DADOS PARA LA SIGUIENTE RONDA</h2><p class="count-instruction">El recuento comienza con el máximo de dados disponibles al inicio de esta ronda. Resta los dados que haya perdido cada jugador.</p>
  ${adjustRow('p1',state.p1,state.remaining1)}<small class="muted">Máximo de ${esc(state.p1)}: ${state.d1}</small>${adjustRow('p2',state.p2,state.remaining2)}<small class="muted">Máximo de ${esc(state.p2)}: ${state.d2}</small>${state.countLimitNotice?`<p class="notice" role="alert">${esc(state.countLimitNotice)}</p>`:''}
  <div class="choice-row">${btn('CONFIRMAR Y CONTINUAR','confirm-count')}</div></section>${backButton()}`}
-function countConfirmScreen(){view.innerHTML=`<section class="panel flow-panel"><h2>¿SON CORRECTOS LOS CAMBIOS?</h2><p class="flow-intro">${esc(state.p1)}: ${state.remaining1} dados · ${esc(state.p2)}: ${state.remaining2} dados</p><div class="choice-row">${btn('SÍ, COMENZAR SIGUIENTE RONDA','count-confirm-yes')}${btn('NO, VOLVER A MODIFICAR','count-confirm-no')}</div></section>${backButton()}`}
+function countConfirmScreen(){const yes=btn('SÍ, COMENZAR SIGUIENTE RONDA','count-confirm-yes').replace('<button ','<button style="flex:0 1 320px;max-width:100%" ');const no=btn('NO, VOLVER A MODIFICAR','count-confirm-no').replace('<button ','<button style="flex:0 1 320px;max-width:100%" ');view.innerHTML=`<section class="panel flow-panel"><h2>¿SON CORRECTOS LOS CAMBIOS?</h2><p class="flow-intro">${esc(state.p1)}: ${state.remaining1} dados · ${esc(state.p2)}: ${state.remaining2} dados</p><div class="choice-row" style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap">${yes}${no}</div></section>${backButton()}`}
 // adjustRow(): una fila con nombre del jugador y botones − / + (se usa en countScreen).
 function adjustRow(id,name,val){return `<div class="player-adjust"><button data-adjust="${id}" data-delta="-1" aria-label="Restar">−</button><div><div class="pname">${esc(name)}</div><div class="count">${val}</div></div><button data-adjust="${id}" data-delta="1" aria-label="Sumar">+</button></div>`}
 // FINAL DE LA RONDA 6: ya hecho el recuento de puntos, pregunta si hay turno 7.
 //   FIN DE PARTIDA   -> pantalla final (no se cuentan dados porque no hay más rondas)
 //   JUGAR TURNO 7    -> pantalla de dados para la siguiente ronda y después RONDA 7
 function finishChoice(){view.innerHTML=`<section class="panel flow-panel"><h2>FINAL DE LA RONDA 6</h2><p class="flow-intro">Recuento hecho. ¿Se da por terminada la batalla o se juega un turno 7?</p><div class="choice-row">${btn('FIN DE PARTIDA','end-match')}${btn('JUGAR TURNO 7','round-seven')}</div></section>${backButton()}`}
+
+// RECUENTO DE BAJAS: marcador acumulado de bajas eliminadas por cada jugador.
+function casualtiesScreen(){
+ view.innerHTML=`
+ <section class="panel">
+  <div class="round-finish-area">
+   <div class="round-finish-title">RECUENTO DE BAJAS</div>
+   <div class="curtain" id="casualtyCurtain"></div>
+  </div>
+  <h2 class="score-heading">PUNTUACION PARA CADA JUGADOR</h2>
+  <div class="score-board">
+   ${scoreRow('p1',state.p1,state.casualtyScore1)}
+   ${scoreRow('p2',state.p2,state.casualtyScore2)}
+  </div>
+  <div class="draw-actions score-continue">${btn('CONTINUAR','continue-casualties')}</div>
+ </section>${backButton()}`;
+ requestAnimationFrame(()=>{const c=$('#casualtyCurtain');if(c)c.classList.add('lift')});
+}
 // PARTIDA FINALIZADA: duración total, selección del resultado (J1 / J2 / EMPATE)
 // y botón VOLVER.
 function winner(){
@@ -531,7 +553,7 @@ function roundFinished(){
    ${scoreRow('p2',state.p2,state.roundScore2)}
   </div>
   <div class="draw-actions score-continue">
-   ${btn('CONTINUAR','continue-round')}
+   ${btn('RECUENTO BAJAS','open-casualties')}
   </div>
  </section>${backButton()}`;   // backButton(): iconos de volver e inicio, como en el resto de la web
  requestAnimationFrame(()=>{
@@ -790,42 +812,40 @@ function endRound(){
  save();
  render();
 }
-// continueRound(): tras la ronda. Si era la 7, termina la partida y para el reloj;
-// si no, va a la pantalla para indicar los dados de la siguiente ronda.
-function continueRound(){
-
- if(state.scoreApplied)return;
-
- // Sumar los puntos de esta ronda al marcador total.
- state.score1+=Number(state.roundScore1||0);
- state.score2+=Number(state.roundScore2||0);
-
- // Marcar la puntuación como aplicada para evitar duplicados.
- state.scoreApplied=true;
-
- // Preparar los puntos provisionales de la siguiente ronda.
- state.roundScore1=0;
- state.roundScore2=0;
-
- if(state.round===7){
+// Aplicar los puntos de victoria y abrir el recuento de bajas.
+function openCasualties(){
+ if(!state.scoreApplied){
+  state.score1+=Number(state.roundScore1||0);
+  state.score2+=Number(state.roundScore2||0);
+  state.scoreApplied=true;
+ }
+ // En ronda 6 se decide primero si la partida termina o se juega ronda 7.
+ // Si se juega ronda 7, se omite el recuento de bajas de la ronda 6.
+ state.screen=state.round===6?'finish-choice':'casualties';
+ save();render();
+}
+function continueCasualties(){
+ if(state.round===7||state.endAfterCasualties){
   state.timerStoppedAt=Date.now();
   state.screen='winner';
- }else if(state.round===6){
-  // Tras el recuento de la ronda 6 se pregunta si hay turno 7 (los dados se cuentan solo si lo hay)
-  state.screen='finish-choice';
  }else{
   state.remaining1=state.d1;
   state.remaining2=state.d2;
   state.countLimitNotice='';
   state.screen='count';
  }
-
- save();
- render();
+ save();render();
 }
-// confirmCount(): confirma los dados y pasa a la siguiente ronda (la pregunta del turno 7 ya se hizo antes).
+// Confirmar recuento de dados y revisar los valores antes de iniciar la ronda siguiente.
 function confirmCount(){state.screen='count-confirm';render()}
-function acceptCount(){state.round++;state.screen='round-title';save();render()}
+function acceptCount(){
+ // Los dados que quedan pasan a ser el nuevo máximo para la siguiente ronda.
+ state.d1=state.remaining1;
+ state.d2=state.remaining2;
+ state.round++;
+ state.screen='round-title';
+ save();render();
+}
 // ----- REINICIAR PARTIDA (ventana de confirmación definida en index.html) ------
 // resetMatch abre la ventana · closeResetModal la cierra · confirmResetMatch borra todo.
 function resetMatch(){const modal=$('#resetConfirmModal');if(modal)modal.classList.add('open')}
@@ -895,7 +915,7 @@ view.addEventListener('click',e=>{
  else if(a==='factions'){state.screen='factions';render()}
  else if(a==='rules-pdf'){state.screen='rules-pdf';render()}   // abre REFERENCIA REGLAS
  else if(a==='resume'){state.screen=state.screenBeforePause||(state.bag&&state.bag.length?'draw':'round-title');state.resumeNotice=true;render()}
- else if(a==='go-home'){if(['draw','round-title','round-finished','count','finish-choice','winner','auto-ask','auto-mode','zone-pick','deploy-pick','auto-result','predeploy'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
+ else if(a==='go-home'){if(['draw','round-title','round-finished','casualties','count','count-confirm','finish-choice','winner','auto-ask','auto-mode','zone-pick','deploy-pick','auto-result','predeploy'].includes(state.screen))state.screenBeforePause=state.screen;state.screen='home';render()}
  // Botón REINICIAR PARTIDA y navegación Volver / Inicio / Continuar
  else if(a==='reset')resetMatch()
   else if(a==='back'){
@@ -949,25 +969,30 @@ state[key]=clamp(state[key]+delta,1,50);
   if(index!==-1){state.bag.splice(index,1);state.removeDieOpen=false;save();render()}
  }
 else if(b.dataset.score){
-  const key=b.dataset.score==='p1'?'roundScore1':'roundScore2';
-
+  const player=b.dataset.score;
   if(state.screen==='round-finished' && !state.scoreApplied){
+    const key=player==='p1'?'roundScore1':'roundScore2';
     state[key]=Math.max(0,Number(state[key]||0)+Number(b.dataset.delta));
-    save();
-    render();
+    save();render();
+  }else if(state.screen==='casualties'){
+    const key=player==='p1'?'casualtyScore1':'casualtyScore2';
+    state[key]=Math.max(0,Number(state[key]||0)+Number(b.dataset.delta));
+    save();render();
   }
 }
  else if(a==='end-round')endRound()
- else if(a==='continue-round')continueRound()
+ else if(a==='continue-round')openCasualties()
+ else if(a==='open-casualties')openCasualties()
+ else if(a==='continue-casualties')continueCasualties()
  else if(a==='confirm-count')confirmCount()
  else if(a==='count-confirm-yes')acceptCount()
  else if(a==='count-confirm-no'){state.screen='count';render()}
 else if(a==='end-match'){
- state.timerStoppedAt=Date.now();
- state.screen='winner';
+ state.endAfterCasualties=true;
+ state.screen='casualties';
  render();
 }
- else if(a==='round-seven'){state.remaining1=state.d1;state.remaining2=state.d2;state.countLimitNotice='';state.screen='count';render()}   // turno 7: primero se cuentan los dados
+ else if(a==='round-seven'){state.endAfterCasualties=false;state.remaining1=state.d1;state.remaining2=state.d2;state.countLimitNotice='';state.screen='count';render()}   // turno 7: se omite bajas de ronda 6 y se cuentan dados
  // --- Pantalla final: elegir resultado y volver ---
  else if(a==='win-p1'){state.winner=state.p1;render()}
  else if(a==='win-p2'){state.winner=state.p2;render()}
