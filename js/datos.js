@@ -557,8 +557,8 @@ Los objetivos se consideran disputados si alguna unidad enemiga de infantería o
 Los vehículos no pueden disputar objetivos.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Posiciones preparadas +Reservas
+Zona de Despliegue: Borde Largo
+Tipo de Despliegue: Posiciones preparadas +Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -595,8 +595,8 @@ A partir del Turno 3, controlar el objetivo otorga puntos iguales al número del
 Si un jugador termina la partida con 2 o más puntos más que su oponente, gana. En caso contrario, el resultado es empate.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Encuentro comprometido / 1ª oleada + Reservas
+Zona de Despliegue: Borde Largo
+Tipo de Despliegue: Encuentro comprometido / 1ª oleada + Reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -627,9 +627,9 @@ PUNTUACIÓN:
 Si un jugador tiene 2 puntos o más que su oponente, gana la partida. Si no, el resultado es empate.
 
 TIPO DE DESPLIEGUE :
-Zona de Despliegue Tipo de Despliegue
-Borde Largo Encuentro comprometido / 1ª oleada + Reservas
-
+Zona de Despliegue: Borde Largo
+Tipo de Despliegue: Encuentro comprometido / 1ª oleada + Reservas
+ 
 REGLAS ESPECIALES:
 Despliegue avanzado: No
 Flanqueo: Sí
@@ -655,8 +655,8 @@ PUNTUACIÓN:
 Si un jugador termina con 2 o más puntos más que su oponente, gana. Si no, es empate.
 
 TIPO DE DESPLIEGUE:
-Zona de Despliegue Tipo de Despliegue
-Borde Corto Posiciones preparadas + reservas
+Zona de Despliegue: Borde corto 
+Tipo de Despliegue: Posiciones preparadas + reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
@@ -686,8 +686,8 @@ PUNTUACIÓN (al final del juego):
 Si un jugador termina con 2 o más puntos más que su oponente, gana. De lo contrario, el resultado es empate.
 
 TIPO DE DESPLIEGUE:
-Zona de Despliegue Tipo de Despliegue
-Cuadrantes Posiciones preparadas + reservas
+Zona de Despliegue: Cuadrantes 
+Tipo de Despliegue: Posiciones preparadas + reservas
 
 REGLAS ESPECIALES:
 Despliegue avanzado: Sí
